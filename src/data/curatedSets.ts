@@ -34,6 +34,27 @@ export const CURATED_SETS: SetDef[] = [
     colors: ['#9b5cff', '#2a1a55'],
     emblem: '✦',
   },
+  {
+    apiName: 'Invasion of Chaos',
+    label: 'Invasion of Chaos',
+    blurb: 'L’ère du Chaos : le Soldat Lustre Noir et le Dragon Empereur du Chaos.',
+    colors: ['#b02a37', '#3a0d12'],
+    emblem: '☯',
+  },
+  {
+    apiName: 'Legacy of Darkness',
+    label: 'Legacy of Darkness',
+    blurb: 'Les ténèbres héritées : Yata-Garasu, Jinzo et les seigneurs sombres.',
+    colors: ['#2f6b4f', '#0e2418'],
+    emblem: '🌑',
+  },
+  {
+    apiName: "Magician's Force",
+    label: "Magician's Force",
+    blurb: 'La force des mages : le Paladin Noir et Briseur le Guerrier Magique.',
+    colors: ['#7a3ea8', '#2a1140'],
+    emblem: '🪄',
+  },
 ]
 
 /** Retrouve une définition de set par son nom API. */

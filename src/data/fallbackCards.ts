@@ -44,6 +44,9 @@ const LOB = 'Legend of Blue Eyes White Dragon'
 const MRD = 'Metal Raiders'
 const PSV = "Pharaoh's Servant"
 const SRL = 'Spell Ruler'
+const IOC = 'Invasion of Chaos'
+const LOD = 'Legacy of Darkness'
+const MFC = "Magician's Force"
 
 export const FALLBACK_CARDS: Record<string, ApiCard[]> = {
   [LOB]: [
@@ -101,5 +104,37 @@ export const FALLBACK_CARDS: Record<string, ApiCard[]> = {
     card(46448938, 'Rush Recklessly', 'Spell Card', SRL, 'Common'),
     card(3549275, 'The Reliable Guardian', 'Spell Card', SRL, 'Common'),
     card(29401950, 'Mystical Sheep #1', 'Normal Monster', SRL, 'Common', { atk: 1150, def: 900, level: 4, attribute: 'EARTH', race: 'Beast' }),
+  ],
+  [IOC]: [
+    card(72989439, 'Black Luster Soldier - Envoy of the Beginning', 'Effect Monster', IOC, 'Ultra Rare', { atk: 3000, def: 2500, level: 8, attribute: 'LIGHT', race: 'Warrior' }),
+    card(82301904, 'Chaos Emperor Dragon - Envoy of the End', 'Effect Monster', IOC, 'Secret Rare', { atk: 3000, def: 2500, level: 8, attribute: 'DARK', race: 'Dragon' }),
+    card(40737112, 'Dark Magician of Chaos', 'Effect Monster', IOC, 'Ultra Rare', { atk: 2800, def: 2600, level: 8, attribute: 'DARK', race: 'Spellcaster' }),
+    card(9596126, 'Chaos Sorcerer', 'Effect Monster', IOC, 'Super Rare', { atk: 2300, def: 2000, level: 6, attribute: 'DARK', race: 'Spellcaster' }),
+    card(16226786, 'Night Assailant', 'Effect Monster', IOC, 'Rare', { atk: 200, def: 300, level: 3, attribute: 'FIRE', race: 'Fiend' }),
+    card(4208759, 'Manticore of Darkness', 'Effect Monster', IOC, 'Rare', { atk: 2300, def: 1000, level: 6, attribute: 'FIRE', race: 'Beast' }),
+    card(7572887, 'D.D. Warrior Lady', 'Effect Monster', IOC, 'Common', { atk: 1500, def: 1600, level: 4, attribute: 'LIGHT', race: 'Warrior' }),
+    card(8131171, 'Sinister Serpent', 'Effect Monster', IOC, 'Common', { atk: 300, def: 250, level: 1, attribute: 'WATER', race: 'Reptile' }),
+    card(39507162, 'Mad Sword Beast', 'Effect Monster', IOC, 'Common', { atk: 1400, def: 1200, level: 4, attribute: 'EARTH', race: 'Dinosaur' }),
+  ],
+  [LOD]: [
+    card(3078576, 'Yata-Garasu', 'Effect Monster', LOD, 'Secret Rare', { atk: 200, def: 100, level: 2, attribute: 'WIND', race: 'Winged Beast' }),
+    card(46231121, 'Dark Ruler Ha Des', 'Effect Monster', LOD, 'Ultra Rare', { atk: 2450, def: 1600, level: 6, attribute: 'DARK', race: 'Fiend' }),
+    card(77585513, 'Jinzo', 'Effect Monster', LOD, 'Ultra Rare', { atk: 2400, def: 1500, level: 6, attribute: 'DARK', race: 'Machine' }),
+    card(18036057, 'Airknight Parshath', 'Effect Monster', LOD, 'Super Rare', { atk: 1900, def: 1400, level: 5, attribute: 'LIGHT', race: 'Fairy' }),
+    card(79575620, 'Injection Fairy Lily', 'Effect Monster', LOD, 'Super Rare', { atk: 400, def: 1500, level: 3, attribute: 'EARTH', race: 'Spellcaster' }),
+    card(43586926, 'Twin-Headed Behemoth', 'Effect Monster', LOD, 'Rare', { atk: 1500, def: 1200, level: 3, attribute: 'WIND', race: 'Dragon' }),
+    card(39507162, 'Mad Sword Beast', 'Effect Monster', LOD, 'Common', { atk: 1400, def: 1200, level: 4, attribute: 'EARTH', race: 'Dinosaur' }),
+    card(8131171, 'Sinister Serpent', 'Effect Monster', LOD, 'Common', { atk: 300, def: 250, level: 1, attribute: 'WATER', race: 'Reptile' }),
+    card(7572887, 'D.D. Warrior Lady', 'Effect Monster', LOD, 'Common', { atk: 1500, def: 1600, level: 4, attribute: 'LIGHT', race: 'Warrior' }),
+  ],
+  [MFC]: [
+    card(98502113, 'Dark Paladin', 'Fusion Monster', MFC, 'Secret Rare', { atk: 2900, def: 2400, level: 8, attribute: 'DARK', race: 'Spellcaster' }),
+    card(78706415, 'Reflect Bounder', 'Effect Monster', MFC, 'Ultra Rare', { atk: 1700, def: 1000, level: 4, attribute: 'LIGHT', race: 'Machine' }),
+    card(71413901, 'Breaker the Magical Warrior', 'Effect Monster', MFC, 'Super Rare', { atk: 1600, def: 1000, level: 4, attribute: 'DARK', race: 'Spellcaster' }),
+    card(21598948, 'Big Shield Gardna', 'Effect Monster', MFC, 'Rare', { atk: 100, def: 2600, level: 4, attribute: 'EARTH', race: 'Warrior' }),
+    card(18036057, 'Airknight Parshath', 'Effect Monster', MFC, 'Rare', { atk: 1900, def: 1400, level: 5, attribute: 'LIGHT', race: 'Fairy' }),
+    card(39507162, 'Mad Sword Beast', 'Effect Monster', MFC, 'Common', { atk: 1400, def: 1200, level: 4, attribute: 'EARTH', race: 'Dinosaur' }),
+    card(7572887, 'D.D. Warrior Lady', 'Effect Monster', MFC, 'Common', { atk: 1500, def: 1600, level: 4, attribute: 'LIGHT', race: 'Warrior' }),
+    card(8131171, 'Sinister Serpent', 'Effect Monster', MFC, 'Common', { atk: 300, def: 250, level: 1, attribute: 'WATER', race: 'Reptile' }),
   ],
 }
