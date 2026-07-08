@@ -1,5 +1,5 @@
 /** Nombre maximum de paquets ouvrables par jour. */
-export const MAX_PACKS_PER_DAY = 5
+export const MAX_PACKS_PER_DAY = 500
 
 const STORAGE_KEY = 'ygo.dailyLimit.v1'
 
