@@ -20,41 +20,6 @@ export const CURATED_SETS: SetDef[] = [
     colors: ['#8a8f9c', '#2b2f3a'],
     emblem: '⚙️',
   },
-  {
-    apiName: "Pharaoh's Servant",
-    label: "Pharaoh's Servant",
-    blurb: 'Les serviteurs du Pharaon et le Jar of Greed. Trésors de l’Égypte antique.',
-    colors: ['#d8a53a', '#5a3d0e'],
-    emblem: '𓂀',
-  },
-  {
-    apiName: 'Spell Ruler',
-    label: 'Spell Ruler',
-    blurb: 'La magie règne. Cartes magie puissantes et invocations rapides.',
-    colors: ['#9b5cff', '#2a1a55'],
-    emblem: '✦',
-  },
-  {
-    apiName: 'Invasion of Chaos',
-    label: 'Invasion of Chaos',
-    blurb: 'L’ère du Chaos : le Soldat Lustre Noir et le Dragon Empereur du Chaos.',
-    colors: ['#b02a37', '#3a0d12'],
-    emblem: '☯',
-  },
-  {
-    apiName: 'Legacy of Darkness',
-    label: 'Legacy of Darkness',
-    blurb: 'Les ténèbres héritées : Yata-Garasu, Jinzo et les seigneurs sombres.',
-    colors: ['#2f6b4f', '#0e2418'],
-    emblem: '🌑',
-  },
-  {
-    apiName: "Magician's Force",
-    label: "Magician's Force",
-    blurb: 'La force des mages : le Paladin Noir et Briseur le Guerrier Magique.',
-    colors: ['#7a3ea8', '#2a1140'],
-    emblem: '🪄',
-  },
 ]
 
 /** Retrouve une définition de set par son nom API. */
