@@ -1,7 +1,7 @@
 import type { Card, Rarity } from '../types'
 
 /** Pièces de départ à la première ouverture de l'app. */
-export const STARTING_COINS = 500
+export const STARTING_COINS = 90000
 /** Coût d'un paquet en pièces. */
 export const PACK_COST = 100
 

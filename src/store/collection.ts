@@ -3,7 +3,7 @@ import type { Card, CollectionState } from '../types'
 import { STARTING_COINS } from '../game/economy'
 
 const COLLECTION_KEY = 'ygo.collection.v1'
-const COINS_KEY = 'ygo.coins.v1'
+const COINS_KEY = 'ygo.coins.v2'
 
 /** Clé unique d'une carte dans la collection (set + id). */
 export function cardKey(card: Card): string {
