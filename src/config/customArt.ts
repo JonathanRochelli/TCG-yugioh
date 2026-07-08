@@ -19,7 +19,7 @@ import cardBackSvg from '../assets/card-back.svg'
  */
 
 /** Utiliser une image perso pour le dos de carte (public/card-back.png). */
-export const USE_CUSTOM_CARD_BACK = false
+export const USE_CUSTOM_CARD_BACK = true
 /** Utiliser des images perso pour les boosters (public/packs/<slug>.png). */
 export const USE_CUSTOM_PACK_IMAGES = true
 
