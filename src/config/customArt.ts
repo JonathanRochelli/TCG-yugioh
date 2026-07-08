@@ -13,11 +13,15 @@ import cardBackSvg from '../assets/card-back.svg'
  *      où <slug> correspond au set (voir `packImageFor` ci-dessous) :
  *        legend-of-blue-eyes-white-dragon, metal-raiders, pharaohs-servant,
  *        spell-ruler, invasion-of-chaos, legacy-of-darkness, magicians-force
- *   2. Passe la constante ci-dessous à `true`.
+ *   2. Passe le réglage correspondant ci-dessous à `true`.
  *
  * Si une image manque, l'app retombe proprement sur le visuel « maison ».
  */
-export const USE_CUSTOM_ART = false
+
+/** Utiliser une image perso pour le dos de carte (public/card-back.png). */
+export const USE_CUSTOM_CARD_BACK = false
+/** Utiliser des images perso pour les boosters (public/packs/<slug>.png). */
+export const USE_CUSTOM_PACK_IMAGES = true
 
 const BASE = import.meta.env.BASE_URL
 
@@ -25,7 +29,9 @@ const BASE = import.meta.env.BASE_URL
 export const CARD_BACK_FALLBACK: string = cardBackSvg
 
 /** Dos de carte affiché (image perso si activée, sinon repli). */
-export const CARD_BACK: string = USE_CUSTOM_ART ? `${BASE}card-back.png` : cardBackSvg
+export const CARD_BACK: string = USE_CUSTOM_CARD_BACK
+  ? `${BASE}card-back.png`
+  : cardBackSvg
 
 /** Transforme un nom de set en nom de fichier (slug). */
 export function slugifySet(apiName: string): string {
@@ -38,6 +44,6 @@ export function slugifySet(apiName: string): string {
 
 /** URL de l'image de booster perso pour un set, si le mode est activé. */
 export function packImageFor(apiName: string): string | undefined {
-  if (!USE_CUSTOM_ART) return undefined
+  if (!USE_CUSTOM_PACK_IMAGES) return undefined
   return `${BASE}packs/${slugifySet(apiName)}.png`
 }
