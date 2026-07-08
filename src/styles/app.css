@@ -98,32 +98,96 @@
   display: flex;
   flex-direction: column;
 }
-.pack-art,
-.booster {
+/* ---- Visuel de booster (partagé boutique + ouverture) ---- */
+.pack {
   position: relative;
   aspect-ratio: 3 / 4;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
   color: #fff;
   overflow: hidden;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 55px rgba(0, 0, 0, 0.35);
 }
-.pack-art__emblem {
-  font-size: 3.4rem;
+/* Bande foil supérieure avec bord déchiré en dents */
+.pack__foil {
+  width: 100%;
+  height: 15%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(230, 230, 235, 0.55)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - 7px) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000 25%, #000 0) bottom / 14px 7px
+      repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - 7px) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000 25%, #000 0) bottom / 14px 7px
+      repeat-x;
 }
-.pack-art__label,
-.booster__label {
+.pack__foil-text {
+  font-size: 0.58rem;
   font-weight: 900;
-  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+  color: #2c2010;
+  text-shadow: none;
+  opacity: 0.85;
+}
+/* Reflet holographique diagonal */
+.pack__holo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.22) 46%,
+    rgba(170, 120, 255, 0.18) 53%,
+    rgba(90, 200, 255, 0.16) 58%,
+    transparent 68%
+  );
+}
+.pack__art {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pack__medallion {
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  background: radial-gradient(
+    circle at 50% 38%,
+    rgba(255, 255, 255, 0.25),
+    rgba(0, 0, 0, 0.28)
+  );
+  border: 3px solid rgba(255, 233, 168, 0.85);
+  box-shadow:
+    0 0 0 6px rgba(0, 0, 0, 0.14),
+    inset 0 0 22px rgba(0, 0, 0, 0.3);
+}
+.pack__label {
+  font-weight: 900;
+  font-size: 1rem;
   text-align: center;
-  padding: 0 16px;
+  padding: 0 14px 14px;
   letter-spacing: 0.02em;
 }
-.pack-art__shine,
-.booster__shine {
+.pack__shine {
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -174,28 +238,26 @@
   justify-content: space-between;
 }
 
-/* Booster fermé cliquable */
-.booster {
-  width: min(320px, 80vw);
-  border-radius: 16px;
+/* Booster fermé cliquable (à l'ouverture) */
+.pack--booster {
+  width: min(300px, 78vw);
+  border-radius: 14px;
   cursor: pointer;
   box-shadow: var(--shadow);
-  border: 2px solid rgba(255, 255, 255, 0.18);
   animation: floaty 3s ease-in-out infinite;
   transition: transform 0.2s ease;
 }
-.booster:hover {
+.pack--booster:hover {
   transform: scale(1.03);
 }
-.booster__emblem {
-  font-size: 4.5rem;
+.pack--booster .pack__medallion {
+  font-size: 4rem;
 }
-.booster__hint {
-  position: absolute;
-  bottom: 16px;
+.pack__hint {
+  padding-bottom: 16px;
   font-size: 0.85rem;
   font-weight: 700;
-  opacity: 0.9;
+  opacity: 0.92;
 }
 @keyframes floaty {
   0%,
@@ -206,7 +268,7 @@
     transform: translateY(-8px);
   }
 }
-.booster--tear {
+.pack--tear {
   animation: tear 0.65s ease forwards;
 }
 @keyframes tear {
@@ -260,17 +322,14 @@
   overflow: hidden;
 }
 .reveal__back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background:
-    radial-gradient(circle at 50% 40%, #3a2f66, #1a1330);
-  border: 2px solid #4a3d80;
+  background: #5e3413;
+  border: 2px solid #a9781f;
 }
-.reveal__back-emblem {
-  font-size: 2.4rem;
-  color: var(--accent);
-  opacity: 0.8;
+.reveal__back-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .reveal__front {
   transform: rotateY(180deg);

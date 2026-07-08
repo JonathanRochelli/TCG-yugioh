@@ -1,6 +1,7 @@
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
 import { CardArt } from './CardArt'
+import cardBack from '../assets/card-back.svg'
 
 interface Props {
   card: Card
@@ -37,7 +38,7 @@ export function CardReveal({ card, revealed, isNew, onReveal, onInspect }: Props
     >
       <div className="reveal__inner">
         <div className="reveal__back">
-          <div className="reveal__back-emblem">𓂀</div>
+          <img className="reveal__back-img" src={cardBack} alt="" draggable={false} />
         </div>
         <div className="reveal__front">
           {foil && <div className="reveal__holo" />}

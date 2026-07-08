@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { Card, SetDef } from '../types'
 import { CardReveal } from './CardReveal'
+import { BoosterPack } from './BoosterPack'
 import { rarityRank } from '../game/rarity'
 
 interface Props {
@@ -60,23 +61,16 @@ export function PackOpening({
   if (phase === 'pack') {
     return (
       <section className="opening">
-        <div
-          className={`booster ${tearing ? 'booster--tear' : ''}`}
-          style={{
-            background: `linear-gradient(160deg, ${set.colors[0]}, ${set.colors[1]})`,
-          }}
-          onClick={tear}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && tear()}
+        <BoosterPack
+          set={set}
+          interactive
+          onActivate={tear}
+          className={`pack--booster ${tearing ? 'pack--tear' : ''}`}
         >
-          <div className="booster__shine" />
-          <div className="booster__emblem">{set.emblem}</div>
-          <div className="booster__label">{set.label}</div>
-          <div className="booster__hint">
+          <div className="pack__hint">
             {tearing ? 'Ouverture…' : 'Clique pour déchirer'}
           </div>
-        </div>
+        </BoosterPack>
       </section>
     )
   }

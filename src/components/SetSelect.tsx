@@ -1,6 +1,7 @@
 import type { SetDef } from '../types'
 import { CURATED_SETS } from '../data/curatedSets'
 import { PACK_COST } from '../game/economy'
+import { BoosterPack } from './BoosterPack'
 
 interface Props {
   coins: number
@@ -35,16 +36,7 @@ export function SetSelect({ coins, packsRemaining, loadingSet, onOpen }: Props) 
             loading || coins < PACK_COST || noPacksLeft || loadingSet !== null
           return (
             <div className="pack-card" key={set.apiName}>
-              <div
-                className="pack-art"
-                style={{
-                  background: `linear-gradient(160deg, ${set.colors[0]}, ${set.colors[1]})`,
-                }}
-              >
-                <div className="pack-art__shine" />
-                <div className="pack-art__emblem">{set.emblem}</div>
-                <div className="pack-art__label">{set.label}</div>
-              </div>
+              <BoosterPack set={set} />
               <div className="pack-card__body">
                 <p className="pack-card__blurb muted">{set.blurb}</p>
                 <button
