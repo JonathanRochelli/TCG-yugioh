@@ -74,6 +74,12 @@ export interface SetDef {
   colors: [string, string]
   /** Emoji/symbole décoratif du pack. */
   emblem: string
+  /**
+   * (Optionnel) URL ou asset importé d'une VRAIE image de booster à afficher
+   * à la place du visuel généré. Laissé vide par défaut : dépose ta propre
+   * image (dont tu détiens les droits) et renseigne ce champ pour l'utiliser.
+   */
+  packImageUrl?: string
 }
 
 /** Entrée de collection : une carte possédée et sa quantité. */

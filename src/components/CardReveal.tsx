@@ -1,12 +1,14 @@
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
 import { CardArt } from './CardArt'
-import cardBack from '../assets/card-back.svg'
+import { CARD_BACK } from '../config/customArt'
 
 interface Props {
   card: Card
   revealed: boolean
   isNew: boolean
+  /** Index dans le paquet, pour décaler l'apparition (effet "burst"). */
+  index?: number
   onReveal: () => void
   onInspect: () => void
 }
@@ -15,7 +17,14 @@ interface Props {
  * Carte à retourner : dos tant que `revealed` est faux, face + effet foil
  * (pour les raretés supérieures) une fois révélée.
  */
-export function CardReveal({ card, revealed, isNew, onReveal, onInspect }: Props) {
+export function CardReveal({
+  card,
+  revealed,
+  isNew,
+  index = 0,
+  onReveal,
+  onInspect,
+}: Props) {
   const foil = isFoil(card.rarity)
   const rarityClass = `r-${card.rarity.replace(/\s+/g, '-')}`
 
@@ -24,7 +33,10 @@ export function CardReveal({ card, revealed, isNew, onReveal, onInspect }: Props
       className={`reveal ${revealed ? 'reveal--open' : ''} ${
         foil ? 'reveal--foil' : ''
       }`}
-      style={{ ['--rarity' as string]: RARITY_COLOR[card.rarity] }}
+      style={{
+        ['--rarity' as string]: RARITY_COLOR[card.rarity],
+        animationDelay: `${index * 55}ms`,
+      }}
       onClick={() => (revealed ? onInspect() : onReveal())}
       role="button"
       tabIndex={0}
@@ -38,7 +50,7 @@ export function CardReveal({ card, revealed, isNew, onReveal, onInspect }: Props
     >
       <div className="reveal__inner">
         <div className="reveal__back">
-          <img className="reveal__back-img" src={cardBack} alt="" draggable={false} />
+          <img className="reveal__back-img" src={CARD_BACK} alt="" draggable={false} />
         </div>
         <div className="reveal__front">
           {foil && <div className="reveal__holo" />}

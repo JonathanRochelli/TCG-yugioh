@@ -47,7 +47,7 @@ export function PackOpening({
 
   function tear() {
     setTearing(true)
-    window.setTimeout(() => setPhase('reveal'), 650)
+    window.setTimeout(() => setPhase('reveal'), 1300)
   }
 
   function reveal(i: number) {
@@ -64,6 +64,7 @@ export function PackOpening({
         <BoosterPack
           set={set}
           interactive
+          tearFx
           onActivate={tear}
           className={`pack--booster ${tearing ? 'pack--tear' : ''}`}
         >
@@ -100,6 +101,7 @@ export function PackOpening({
           <CardReveal
             key={i}
             card={card}
+            index={i}
             revealed={revealed.has(i)}
             isNew={newFlags[i]}
             onReveal={() => reveal(i)}

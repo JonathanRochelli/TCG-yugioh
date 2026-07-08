@@ -208,6 +208,41 @@
     transform: translateX(120%);
   }
 }
+/* Vraie image de booster fournie (remplit tout le pack) */
+.pack__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Éclat lumineux de l'ouverture */
+.pack__flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, #fff, rgba(255, 255, 255, 0));
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+/* Étincelles projetées depuis le haut du pack */
+.pack__sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+.spark {
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, var(--accent) 60%, transparent);
+  opacity: 0;
+}
 .pack-card__body {
   padding: 14px;
   display: flex;
@@ -268,23 +303,99 @@
     transform: translateY(-8px);
   }
 }
+/* --- Déchirure du booster (multi-étapes) --- */
 .pack--tear {
-  animation: tear 0.65s ease forwards;
+  overflow: visible;
+  z-index: 3;
+  animation:
+    tear-shake 0.3s ease,
+    tear-pop 0.58s cubic-bezier(0.3, 0, 0.35, 1) 0.72s forwards;
 }
-@keyframes tear {
+/* La bande foil s'arrache et s'envole */
+.pack--tear .pack__foil {
+  animation: foil-rip 0.55s ease 0.28s forwards;
+  z-index: 4;
+}
+/* Flash lumineux au moment de l'ouverture */
+.pack--tear .pack__flash {
+  animation: pack-flash 0.6s ease 0.6s forwards;
+}
+/* Gerbe d'étincelles */
+.pack--tear .spark {
+  animation: spark-fly 0.75s ease-out 0.32s forwards;
+}
+@keyframes tear-shake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  15% {
+    transform: translateX(-6px) rotate(-1.5deg);
+  }
+  30% {
+    transform: translateX(6px) rotate(1.5deg);
+  }
+  45% {
+    transform: translateX(-5px) rotate(-1deg);
+  }
+  60% {
+    transform: translateX(5px) rotate(1deg);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
+}
+@keyframes foil-rip {
   0% {
-    transform: scale(1) rotate(0);
+    transform: translateY(0) rotate(0);
+    opacity: 1;
   }
-  25% {
-    transform: scale(1.05) rotate(-2deg);
-  }
-  50% {
-    transform: scale(1.08) rotate(2deg);
+  30% {
+    transform: translateY(-6%) rotate(-3deg);
   }
   100% {
-    transform: scale(1.4) rotate(0);
+    transform: translateY(-180%) rotate(-18deg);
     opacity: 0;
-    filter: brightness(2);
+  }
+}
+@keyframes pack-flash {
+  0% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes spark-fly {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(0) scale(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-160px) scale(0.2);
+  }
+}
+@keyframes tear-pop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  55% {
+    transform: scale(1.12) translateY(-6px);
+    filter: brightness(1.5);
+  }
+  100% {
+    transform: scale(1.55) translateY(-12px);
+    opacity: 0;
+    filter: brightness(2.2);
   }
 }
 
