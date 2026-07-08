@@ -476,14 +476,15 @@
 }
 .reveal__badges {
   position: absolute;
-  left: 4px;
   right: 4px;
   bottom: 4px;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 4px;
+  justify-content: flex-end;
   pointer-events: none;
+  z-index: 3;
+}
+.reveal__badges .rarity-chip {
+  background: rgba(0, 0, 0, 0.55);
 }
 .badge {
   font-size: 0.6rem;
@@ -492,8 +493,13 @@
   border-radius: 4px;
 }
 .badge--new {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: 3;
   background: var(--ok);
   color: #05271b;
+  pointer-events: none;
 }
 
 /* Effet holographique animé */
@@ -793,4 +799,105 @@
   text-align: center;
   margin-top: 60px;
   font-size: 0.78rem;
+}
+
+/* ============================ Responsive / mobile ============================ */
+html,
+body {
+  overflow-x: hidden;
+}
+
+@media (max-width: 680px) {
+  .app {
+    padding: 0 12px 60px;
+  }
+
+  /* En-tête : marque sur sa ligne, nav + stats en dessous */
+  .header {
+    gap: 10px;
+    row-gap: 12px;
+    padding: 14px 0 18px;
+  }
+  .header__brand {
+    flex: 1 1 100%;
+    margin-right: 0;
+  }
+  .header__title {
+    font-size: 1.05rem;
+  }
+  .header__subtitle {
+    font-size: 0.72rem;
+  }
+  .header__nav {
+    margin-right: auto;
+  }
+  .header__nav button,
+  .stat {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .section-head h1 {
+    font-size: 1.35rem;
+  }
+  .opening__head h2 {
+    font-size: 1.1rem;
+  }
+
+  /* Grilles plus denses sur petit écran */
+  .pack-grid {
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 14px;
+  }
+  .reveal-grid,
+  .collection-grid {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
+  }
+
+  /* Progression : pastilles plus compactes */
+  .progress-pill {
+    font-size: 0.78rem;
+    padding: 7px 11px;
+    gap: 8px;
+  }
+  .progress-pill__bar {
+    width: 46px;
+  }
+
+  /* Modale : image au-dessus des infos, hauteur limitée */
+  .modal {
+    max-height: 90vh;
+    overflow: auto;
+  }
+  .modal__body {
+    flex-direction: column;
+    align-items: center;
+    padding: 18px;
+    gap: 16px;
+  }
+  .modal__art {
+    width: 62%;
+    max-width: 220px;
+  }
+  .modal__info {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .pack-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .pack__label {
+    font-size: 0.85rem;
+  }
+  .reveal-grid,
+  .collection-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .recap__actions button {
+    flex: 1 1 100%;
+  }
 }

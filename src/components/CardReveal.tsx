@@ -55,8 +55,8 @@ export function CardReveal({
         <div className="reveal__front">
           {foil && <div className="reveal__holo" />}
           <CardArt card={card} small />
+          {isNew && <span className="badge badge--new">NOUVEAU</span>}
           <div className="reveal__badges">
-            {isNew && <span className="badge badge--new">NOUVEAU</span>}
             <span className={`rarity-chip ${rarityClass}`}>{card.rarity}</span>
           </div>
         </div>
