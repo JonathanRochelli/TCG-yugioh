@@ -1,15 +1,43 @@
 import cardBackSvg from '../assets/card-back.svg'
 
 /**
- * Dos de carte utilisé sur TOUTES les cartes (avant retournement).
+ * Images personnalisées (tes propres fichiers, dont tu détiens les droits).
  *
- * Par défaut : le visuel « maison » (SVG intégré, toujours disponible).
+ * Konami détient les visuels officiels Yu-Gi-Oh : je ne les fournis pas.
+ * Toi, tu peux déposer tes fichiers et l'app les utilisera automatiquement.
  *
- * Pour utiliser TA PROPRE image (dont tu détiens les droits) :
- *   1. Dépose ton fichier dans `src/assets/` (ex. `card-back-custom.jpg`).
- *   2. Importe-le et exporte-le ici à la place :
- *        import myBack from '../assets/card-back-custom.jpg'
- *        export const CARD_BACK: string = myBack
- * Rien d'autre à changer : l'app l'utilisera partout.
+ * MODE D'EMPLOI :
+ *   1. Dépose tes images dans le dossier `public/` du projet :
+ *        • Dos de carte  ->  public/card-back.png
+ *        • Boosters       ->  public/packs/<slug>.png
+ *      où <slug> correspond au set (voir `packImageFor` ci-dessous) :
+ *        legend-of-blue-eyes-white-dragon, metal-raiders, pharaohs-servant,
+ *        spell-ruler, invasion-of-chaos, legacy-of-darkness, magicians-force
+ *   2. Passe la constante ci-dessous à `true`.
+ *
+ * Si une image manque, l'app retombe proprement sur le visuel « maison ».
  */
-export const CARD_BACK: string = cardBackSvg
+export const USE_CUSTOM_ART = false
+
+const BASE = import.meta.env.BASE_URL
+
+/** Dos de carte « maison » (repli, toujours disponible). */
+export const CARD_BACK_FALLBACK: string = cardBackSvg
+
+/** Dos de carte affiché (image perso si activée, sinon repli). */
+export const CARD_BACK: string = USE_CUSTOM_ART ? `${BASE}card-back.png` : cardBackSvg
+
+/** Transforme un nom de set en nom de fichier (slug). */
+export function slugifySet(apiName: string): string {
+  return apiName
+    .toLowerCase()
+    .replace(/'/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+/** URL de l'image de booster perso pour un set, si le mode est activé. */
+export function packImageFor(apiName: string): string | undefined {
+  if (!USE_CUSTOM_ART) return undefined
+  return `${BASE}packs/${slugifySet(apiName)}.png`
+}

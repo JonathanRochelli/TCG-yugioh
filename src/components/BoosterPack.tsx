@@ -1,5 +1,6 @@
 import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import type { SetDef } from '../types'
+import { packImageFor } from '../config/customArt'
 
 interface Props {
   set: SetDef
@@ -28,7 +29,8 @@ export function BoosterPack({
   children,
 }: Props) {
   const [photoBroken, setPhotoBroken] = useState(false)
-  const usePhoto = Boolean(set.packImageUrl) && !photoBroken
+  const photoUrl = set.packImageUrl ?? packImageFor(set.apiName)
+  const usePhoto = Boolean(photoUrl) && !photoBroken
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -51,7 +53,7 @@ export function BoosterPack({
       {usePhoto ? (
         <img
           className="pack__photo"
-          src={set.packImageUrl}
+          src={photoUrl}
           alt={set.label}
           draggable={false}
           onError={() => setPhotoBroken(true)}

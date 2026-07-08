@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
 import { CardArt } from './CardArt'
-import { CARD_BACK } from '../config/customArt'
+import { CARD_BACK, CARD_BACK_FALLBACK } from '../config/customArt'
 
 interface Props {
   card: Card
@@ -27,6 +28,7 @@ export function CardReveal({
 }: Props) {
   const foil = isFoil(card.rarity)
   const rarityClass = `r-${card.rarity.replace(/\s+/g, '-')}`
+  const [backSrc, setBackSrc] = useState(CARD_BACK)
 
   return (
     <div
@@ -50,7 +52,13 @@ export function CardReveal({
     >
       <div className="reveal__inner">
         <div className="reveal__back">
-          <img className="reveal__back-img" src={CARD_BACK} alt="" draggable={false} />
+          <img
+            className="reveal__back-img"
+            src={backSrc}
+            alt=""
+            draggable={false}
+            onError={() => setBackSrc(CARD_BACK_FALLBACK)}
+          />
         </div>
         <div className="reveal__front">
           {foil && <div className="reveal__holo" />}
