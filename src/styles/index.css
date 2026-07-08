@@ -1,0 +1,142 @@
+:root {
+  /* Palette "duel" sombre */
+  --bg: #0b0e17;
+  --bg-elev: #151a2b;
+  --bg-elev-2: #1e2540;
+  --border: #2c3557;
+  --text: #e9ecf5;
+  --text-dim: #9aa3c0;
+  --accent: #f5c542; /* or Millénium */
+  --accent-2: #7b5cff; /* violet mystique */
+  --danger: #ff5470;
+  --ok: #34d399;
+
+  /* Couleurs de rareté */
+  --r-common: #b6bdd6;
+  --r-rare: #5b8dff;
+  --r-super: #35d0c0;
+  --r-ultra: #ffb020;
+  --r-secret: #c86bff;
+
+  --radius: 12px;
+  --card-radius: 6px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #1a2140 0%, transparent 60%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 0.4em;
+  line-height: 1.15;
+}
+
+a {
+  color: var(--accent);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.7em 1.2em;
+  font-weight: 700;
+  color: #1a1408;
+  background: linear-gradient(180deg, #ffd766, var(--accent));
+  transition:
+    transform 0.08s ease,
+    filter 0.15s ease,
+    opacity 0.15s ease;
+  box-shadow: 0 6px 18px rgba(245, 197, 66, 0.25);
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+button.secondary {
+  color: var(--text);
+  background: var(--bg-elev-2);
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+
+.app {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+.muted {
+  color: var(--text-dim);
+}
+
+/* Utilitaire pour badges de rareté */
+.rarity-chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.18em 0.55em;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.r-Common {
+  color: var(--r-common);
+}
+.r-Rare {
+  color: var(--r-rare);
+}
+.r-Super.Rare,
+.r-Super-Rare {
+  color: var(--r-super);
+}
+.r-Ultra-Rare {
+  color: var(--r-ultra);
+}
+.r-Secret-Rare {
+  color: var(--r-secret);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

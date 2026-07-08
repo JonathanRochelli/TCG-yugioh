@@ -1,0 +1,62 @@
+import type { Card } from '../types'
+import { RARITY_COLOR, isFoil } from '../game/rarity'
+import { CardArt } from './CardArt'
+
+interface Props {
+  card: Card
+  ownedCount: number
+  onClose: () => void
+}
+
+export function CardModal({ card, ownedCount, onClose }: Props) {
+  const rarityClass = `r-${card.rarity.replace(/\s+/g, '-')}`
+  const stats: Array<[string, string | number | undefined]> = [
+    ['Type', card.type],
+    ['Attribut', card.attribute],
+    ['Race', card.race],
+    ['Niveau', card.level],
+    ['ATK', card.atk],
+    ['DEF', card.def],
+  ]
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div
+        className="modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{ ['--rarity' as string]: RARITY_COLOR[card.rarity] }}
+      >
+        <button className="modal__close secondary" onClick={onClose}>
+          ✕
+        </button>
+        <div className="modal__body">
+          <div className={`modal__art ${isFoil(card.rarity) ? 'modal__art--foil' : ''}`}>
+            {isFoil(card.rarity) && <div className="reveal__holo" />}
+            <CardArt card={card} />
+          </div>
+          <div className="modal__info">
+            <h2>{card.name}</h2>
+            <div className="modal__chips">
+              <span className={`rarity-chip ${rarityClass}`}>{card.rarity}</span>
+              <span className="rarity-chip r-Common">{card.setName}</span>
+            </div>
+            <dl className="modal__stats">
+              {stats
+                .filter(([, v]) => v !== undefined && v !== '')
+                .map(([label, value]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+            </dl>
+            {card.desc && <p className="modal__desc muted">{card.desc}</p>}
+            <div className="modal__owned">
+              Possédée ×{ownedCount}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
