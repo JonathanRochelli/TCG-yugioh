@@ -19,7 +19,7 @@ interface Props {
   canOpenAnother: boolean
   onOpenAnother: () => void
   onGoCollection: () => void
-  onInspect: (card: Card) => void
+  onInspect: (list: Card[], index: number) => void
 }
 
 type Phase = 'pack' | 'reveal'
@@ -133,7 +133,7 @@ export function PackOpening({
             revealed={revealed.has(i)}
             isNew={newFlags[i]}
             onReveal={() => reveal(i)}
-            onInspect={() => onInspect(card)}
+            onInspect={() => onInspect(pack, i)}
           />
         ))}
       </div>
@@ -149,7 +149,7 @@ export function PackOpening({
           </div>
           <div className="recap__stats muted">
             {pack.length} cartes · {newCount} nouvelle{newCount > 1 ? 's' : ''}
-            {dustEarned > 0 && <> · +{dustEarned} 🪙 de poussière</>}
+            {dustEarned > 0 && <> · +{dustEarned} ✨ de poussière</>}
           </div>
           <div className="recap__actions">
             <button onClick={onOpenAnother} disabled={!canOpenAnother}>

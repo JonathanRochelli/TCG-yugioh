@@ -3,19 +3,23 @@ import type { Card, CollectionState } from '../types'
 import { CURATED_SETS } from '../data/curatedSets'
 import { getKnownSetCards } from '../api/ygoprodeck'
 import { RARITY_ORDER, rarityRank } from '../game/rarity'
-import { rarityLabel } from '../game/i18n'
+import { rarityLabel, translateAttribute } from '../game/i18n'
 import { cardKey, setProgress } from '../store/collection'
 import { CardArt } from './CardArt'
 
 interface Props {
   collection: CollectionState
-  onInspect: (card: Card) => void
+  dust: number
+  onInspect: (list: Card[], index: number) => void
+  onRecycleDuplicates: () => void
   onGoShop: () => void
 }
 
 type Ownership = 'owned' | 'missing'
 type SortKey = 'rarity' | 'atk' | 'name'
 type TypeFilter = 'all' | 'Monster' | 'Spell' | 'Trap'
+
+const ATTRIBUTES = ['LIGHT', 'DARK', 'EARTH', 'WATER', 'FIRE', 'WIND', 'DIVINE']
 
 interface Item {
   card: Card
@@ -28,16 +32,25 @@ function typeCategory(type: string): TypeFilter {
   return 'Monster'
 }
 
-export function Collection({ collection, onInspect, onGoShop }: Props) {
+export function Collection({
+  collection,
+  dust,
+  onInspect,
+  onRecycleDuplicates,
+  onGoShop,
+}: Props) {
   const entries = useMemo(() => Object.values(collection), [collection])
   const [setFilter, setSetFilter] = useState<string>('all')
   const [query, setQuery] = useState('')
   const [ownership, setOwnership] = useState<Ownership>('owned')
   const [sort, setSort] = useState<SortKey>('rarity')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
+  const [attrFilter, setAttrFilter] = useState<string>('all')
+  const [levelFilter, setLevelFilter] = useState<string>('all')
 
   const totalUnique = entries.length
   const totalCopies = entries.reduce((s, e) => s + e.count, 0)
+  const duplicateCount = entries.filter((e) => e.count > 1).length
 
   const items = useMemo<Item[]>(() => {
     let base: Item[]
@@ -56,6 +69,8 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
     const q = query.trim().toLowerCase()
     return base
       .filter((it) => typeFilter === 'all' || typeCategory(it.card.type) === typeFilter)
+      .filter((it) => attrFilter === 'all' || it.card.attribute === attrFilter)
+      .filter((it) => levelFilter === 'all' || it.card.level === Number(levelFilter))
       .filter((it) => !q || it.card.name.toLowerCase().includes(q))
       .sort((a, b) => {
         if (sort === 'atk') return (b.card.atk ?? -1) - (a.card.atk ?? -1)
@@ -65,7 +80,9 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
           a.card.name.localeCompare(b.card.name)
         )
       })
-  }, [entries, collection, setFilter, query, ownership, sort, typeFilter])
+  }, [entries, collection, setFilter, query, ownership, sort, typeFilter, attrFilter, levelFilter])
+
+  const cardList = useMemo(() => items.map((it) => it.card), [items])
 
   if (totalUnique === 0) {
     return (
@@ -83,7 +100,8 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
       <div className="section-head">
         <h1>Ma collection</h1>
         <p className="muted">
-          {totalUnique} cartes uniques · {totalCopies} au total
+          {totalUnique} cartes uniques · {totalCopies} au total · ✨ {dust}{' '}
+          poussière
         </p>
       </div>
 
@@ -111,7 +129,7 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
         })}
       </div>
 
-      {/* Barre d'outils : recherche, possédées/manquantes, tri, type */}
+      {/* Barre d'outils */}
       <div className="toolbar toolbar--wrap">
         <input
           className="search"
@@ -133,44 +151,55 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
             Manquantes
           </button>
         </div>
-        <select
-          className="select"
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortKey)}
-          aria-label="Trier par"
-        >
+        <select className="select" value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label="Trier par">
           <option value="rarity">Rareté</option>
           <option value="atk">ATK</option>
           <option value="name">Nom</option>
         </select>
-        <select
-          className="select"
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
-          aria-label="Filtrer par type"
-        >
+        <select className="select" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as TypeFilter)} aria-label="Type">
           <option value="all">Tous types</option>
           <option value="Monster">Monstres</option>
           <option value="Spell">Magies</option>
           <option value="Trap">Pièges</option>
         </select>
+        <select className="select" value={attrFilter} onChange={(e) => setAttrFilter(e.target.value)} aria-label="Attribut">
+          <option value="all">Tous attributs</option>
+          {ATTRIBUTES.map((a) => (
+            <option key={a} value={a}>
+              {translateAttribute(a)}
+            </option>
+          ))}
+        </select>
+        <select className="select" value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)} aria-label="Niveau">
+          <option value="all">Tous niveaux</option>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((lv) => (
+            <option key={lv} value={lv}>
+              Niveau {lv}
+            </option>
+          ))}
+        </select>
+        {duplicateCount > 0 && (
+          <button className="secondary" onClick={onRecycleDuplicates}>
+            ♻️ Recycler {duplicateCount} doublon{duplicateCount > 1 ? 's' : ''}
+          </button>
+        )}
       </div>
 
       {ownership === 'missing' && setFilter === 'all' ? (
         <p className="muted" style={{ textAlign: 'center', marginTop: 24 }}>
           Choisis un set ci-dessus pour voir les cartes qu'il te reste à
-          obtenir.
+          obtenir (fabricables avec de la poussière ✨).
         </p>
       ) : (
         <div className="collection-grid">
-          {items.map((it) => {
+          {items.map((it, idx) => {
             const rarityClass = `r-${it.card.rarity.replace(/\s+/g, '-')}`
             const missing = it.count === 0
             return (
               <div
                 key={`${it.card.setName}-${it.card.id}`}
                 className={`coll-card ${missing ? 'coll-card--missing' : ''}`}
-                onClick={() => onInspect(it.card)}
+                onClick={() => onInspect(cardList, idx)}
               >
                 <CardArt card={it.card} small />
                 {it.count > 1 && <span className="coll-card__count">×{it.count}</span>}

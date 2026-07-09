@@ -1183,6 +1183,132 @@ button:focus-visible,
   outline-offset: 2px;
 }
 
+/* ============================ Accueil « temple » ============================ */
+.home {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+.home__frame {
+  position: relative;
+  max-width: 620px;
+  padding: 52px 34px;
+  border-radius: 18px;
+  border: 1px solid var(--border-strong);
+  background: linear-gradient(180deg, rgba(20, 21, 42, 0.72), rgba(8, 10, 21, 0.6));
+  backdrop-filter: blur(4px);
+  box-shadow:
+    0 0 0 1px rgba(214, 178, 92, 0.15),
+    inset 0 0 0 2px rgba(214, 178, 92, 0.1),
+    var(--shadow);
+}
+.home__frame::before,
+.home__frame::after {
+  content: '';
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--gold);
+}
+.home__frame::before {
+  top: 12px;
+  left: 12px;
+  border-right: none;
+  border-bottom: none;
+}
+.home__frame::after {
+  bottom: 12px;
+  right: 12px;
+  border-left: none;
+  border-top: none;
+}
+.home__emblem {
+  font-size: 4rem;
+  color: var(--gold-bright);
+  filter: drop-shadow(0 0 22px rgba(230, 194, 100, 0.55));
+}
+.home__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 5.5vw, 3rem);
+  margin: 10px 0 0;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold) 55%, var(--gold-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.home__rule {
+  height: 8px;
+  width: 170px;
+  margin: 16px auto 20px;
+  background:
+    var(--gold-line),
+    radial-gradient(circle, var(--gold-bright) 0 3px, transparent 4px) center / 12px
+      12px no-repeat;
+}
+.home__tagline {
+  color: var(--text-dim);
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+.home__enter {
+  margin-top: 28px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  padding: 0.9em 1.9em;
+}
+.home__glyphs {
+  margin-top: 30px;
+  color: var(--gold-deep);
+  font-size: 1.4rem;
+  letter-spacing: 0.35em;
+  opacity: 0.75;
+}
+
+/* Navigation dans la modale (◀ ▶) */
+.modal-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.9rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-bright);
+  background: linear-gradient(180deg, var(--bg-elev-2), var(--bg-elev));
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+  z-index: 55;
+}
+.modal-nav--prev {
+  left: max(16px, 3vw);
+}
+.modal-nav--next {
+  right: max(16px, 3vw);
+}
+
+/* Craft / recyclage dans la modale */
+.modal__craft {
+  margin-top: 14px;
+}
+.modal__craft button {
+  width: 100%;
+}
+.modal__craft-hint {
+  font-size: 0.85rem;
+}
+
 /* ============================ Thème « Égypte premium » ============================ */
 /* Titres dorés gravés */
 .header__title,
@@ -1260,6 +1386,38 @@ button:focus-visible,
     0 0 0 1px var(--border-strong),
     inset 0 0 0 2px rgba(214, 178, 92, 0.12),
     var(--shadow);
+}
+.modal::before,
+.modal::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--gold);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.modal::before {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+}
+.modal::after {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+}
+
+@media (max-width: 680px) {
+  .modal-nav {
+    top: auto;
+    bottom: 18px;
+    transform: none;
+    width: 44px;
+    height: 44px;
+  }
 }
 
 /* Cartes de la boutique : bandeau doré supérieur */

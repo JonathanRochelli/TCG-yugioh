@@ -4,20 +4,24 @@ import { isMuted, setMuted } from '../game/sound'
 
 interface Props {
   coins: number
+  dust: number
   packsRemaining: number
   maxPacks: number
   view: View
   onNavigate: (view: View) => void
+  onGoHome: () => void
   collectionCount: number
   onOpenSettings: () => void
 }
 
 export function Header({
   coins,
+  dust,
   packsRemaining,
   maxPacks,
   view,
   onNavigate,
+  onGoHome,
   collectionCount,
   onOpenSettings,
 }: Props) {
@@ -31,7 +35,7 @@ export function Header({
 
   return (
     <header className="header">
-      <div className="header__brand" onClick={() => onNavigate('sets')}>
+      <div className="header__brand" onClick={onGoHome}>
         <span className="header__emblem">𓂀</span>
         <div>
           <div className="header__title">Yu-Gi-Oh Boosters</div>
@@ -64,6 +68,10 @@ export function Header({
         <div className="stat" title="Pièces">
           <span className="stat__icon">🪙</span>
           <span className="stat__value">{coins}</span>
+        </div>
+        <div className="stat" title="Poussière (pour fabriquer des cartes)">
+          <span className="stat__icon">✨</span>
+          <span className="stat__value">{dust}</span>
         </div>
         <div className="stat" title="Paquets restants aujourd'hui">
           <span className="stat__icon">📦</span>

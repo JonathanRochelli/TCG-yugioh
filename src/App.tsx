@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Card, SetDef } from './types'
+import { Home } from './components/Home'
 import { Header } from './components/Header'
 import { SetSelect } from './components/SetSelect'
 import { PackOpening } from './components/PackOpening'
@@ -10,7 +11,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { useToast } from './components/Toast'
 import { fetchSetCards, getKnownSetCards } from './api/ygoprodeck'
 import { generatePack } from './game/packOpening'
-import { PACK_COST, dustFromPack } from './game/economy'
+import { CRAFT_COST, DUST_VALUE, PACK_COST, dustFromPack } from './game/economy'
 import {
   MAX_PACKS_PER_DAY,
   canOpenToday,
@@ -30,7 +31,7 @@ import { CURATED_SETS } from './data/curatedSets'
 import { cardKey, useCollection } from './store/collection'
 import './styles/app.css'
 
-export type View = 'sets' | 'opening' | 'collection' | 'profile'
+export type View = 'home' | 'sets' | 'opening' | 'collection' | 'profile'
 
 interface OpenedPack {
   set: SetDef
@@ -41,13 +42,18 @@ interface OpenedPack {
   packCount: number
 }
 
+interface Inspecting {
+  list: Card[]
+  index: number
+}
+
 export default function App() {
   const store = useCollection()
   const { notify } = useToast()
-  const [view, setView] = useState<View>('sets')
+  const [view, setView] = useState<View>('home')
   const [loadingSet, setLoadingSet] = useState<string | null>(null)
   const [opened, setOpened] = useState<OpenedPack | null>(null)
-  const [inspecting, setInspecting] = useState<Card | null>(null)
+  const [inspecting, setInspecting] = useState<Inspecting | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [remaining, setRemaining] = useState<number>(() => packsRemainingToday())
 
@@ -67,6 +73,23 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  function inspect(list: Card[], index: number) {
+    setInspecting({ list, index })
+  }
+
+  function craft(card: Card) {
+    if (store.dust < CRAFT_COST[card.rarity]) return
+    store.craftCard(card)
+    playCoins()
+    notify(`Carte fabriquée : ${card.name}`, 'reward')
+  }
+
+  function recycleOne(card: Card) {
+    if ((store.ownedCount(card) ?? 0) <= 1) return
+    store.recycleOne(card)
+    notify(`Recyclée : +${DUST_VALUE[card.rarity]} ✨`, 'info')
+  }
+
   async function openPacks(set: SetDef, count: number) {
     if (loadingSet) return
     if (!canOpenToday()) {
@@ -74,12 +97,7 @@ export default function App() {
       notify('Limite de paquets atteinte pour aujourd’hui.', 'error')
       return
     }
-    // On borne par les pièces ET les paquets restants.
-    const n = Math.min(
-      count,
-      remaining,
-      Math.floor(store.coins / PACK_COST),
-    )
+    const n = Math.min(count, remaining, Math.floor(store.coins / PACK_COST))
     if (n <= 0) {
       notify('Pas assez de pièces ou de paquets restants.', 'error')
       return
@@ -115,7 +133,9 @@ export default function App() {
       }
 
       const dust = dustFromPack(all, ownedBefore, cardKey)
-      store.addCards(all, dust - n * PACK_COST)
+      store.addCards(all)
+      store.addCoins(-n * PACK_COST)
+      store.addDust(dust)
       setRemaining(recordPacks(n))
 
       setOpened({ set, cards: all, newFlags, dust, offline, packCount: n })
@@ -155,14 +175,20 @@ export default function App() {
     }
   }
 
+  if (view === 'home') {
+    return <Home onEnter={() => setView('sets')} />
+  }
+
   return (
     <div className="app">
       <Header
         coins={store.coins}
+        dust={store.dust}
         packsRemaining={remaining}
         maxPacks={MAX_PACKS_PER_DAY}
         view={view}
         onNavigate={setView}
+        onGoHome={() => setView('home')}
         collectionCount={collectionCount}
         onOpenSettings={() => setSettingsOpen(true)}
       />
@@ -187,14 +213,24 @@ export default function App() {
           canOpenAnother={remaining > 0 && store.coins >= PACK_COST}
           onOpenAnother={() => openPacks(opened.set, 1)}
           onGoCollection={() => setView('collection')}
-          onInspect={setInspecting}
+          onInspect={inspect}
         />
       )}
 
       {view === 'collection' && (
         <Collection
           collection={store.collection}
-          onInspect={setInspecting}
+          dust={store.dust}
+          onInspect={inspect}
+          onRecycleDuplicates={() => {
+            const gained = store.recycleDuplicates()
+            if (gained > 0) {
+              notify(`Doublons recyclés : +${gained} ✨`, 'reward')
+              playCoins()
+            } else {
+              notify('Aucun doublon à recycler.', 'info')
+            }
+          }}
           onGoShop={() => setView('sets')}
         />
       )}
@@ -205,8 +241,13 @@ export default function App() {
 
       {inspecting && (
         <CardModal
-          card={inspecting}
-          ownedCount={store.ownedCount(inspecting)}
+          list={inspecting.list}
+          index={inspecting.index}
+          dust={store.dust}
+          ownedCount={store.ownedCount}
+          onNavigate={(i) => setInspecting({ list: inspecting.list, index: i })}
+          onCraft={craft}
+          onRecycle={recycleOne}
           onClose={() => setInspecting(null)}
         />
       )}

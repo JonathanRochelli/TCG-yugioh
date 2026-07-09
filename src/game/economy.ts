@@ -8,8 +8,8 @@ export const PACK_COST = 100
 export const DAILY_BONUS_COINS = 200
 
 /**
- * Valeur en « poussière » (pièces) obtenue quand on reçoit un DOUBLON.
- * Les cartes déjà possédées sont recyclées en pièces selon leur rareté.
+ * Valeur en « poussière » obtenue quand un DOUBLON est recyclé, selon la
+ * rareté. La poussière est une monnaie distincte des pièces.
  */
 export const DUST_VALUE: Record<Rarity, number> = {
   Common: 2,
@@ -17,6 +17,18 @@ export const DUST_VALUE: Record<Rarity, number> = {
   'Super Rare': 20,
   'Ultra Rare': 50,
   'Secret Rare': 120,
+}
+
+/**
+ * Coût en poussière pour FABRIQUER (craft) une carte manquante, selon sa
+ * rareté. Supérieur à la valeur de recyclage (il faut plusieurs doublons).
+ */
+export const CRAFT_COST: Record<Rarity, number> = {
+  Common: 20,
+  Rare: 60,
+  'Super Rare': 150,
+  'Ultra Rare': 400,
+  'Secret Rare': 1000,
 }
 
 /**

@@ -2,23 +2,49 @@ import { useEffect } from 'react'
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
 import { rarityLabel, translateAttribute, translateRace, translateType } from '../game/i18n'
+import { CRAFT_COST, DUST_VALUE } from '../game/economy'
 import { CardArt } from './CardArt'
 import { Tilt } from './Tilt'
 
 interface Props {
-  card: Card
-  ownedCount: number
+  list: Card[]
+  index: number
+  dust: number
+  ownedCount: (card: Card) => number
+  onNavigate: (index: number) => void
+  onCraft: (card: Card) => void
+  onRecycle: (card: Card) => void
   onClose: () => void
 }
 
-export function CardModal({ card, ownedCount, onClose }: Props) {
+export function CardModal({
+  list,
+  index,
+  dust,
+  ownedCount,
+  onNavigate,
+  onCraft,
+  onRecycle,
+  onClose,
+}: Props) {
+  const card = list[index]
+  const count = ownedCount(card)
+  const craftCost = CRAFT_COST[card.rarity]
+  const hasNav = list.length > 1
+
+  const prev = () => onNavigate((index - 1 + list.length) % list.length)
+  const next = () => onNavigate((index + 1) % list.length)
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
+      else if (e.key === 'ArrowLeft' && hasNav) prev()
+      else if (e.key === 'ArrowRight' && hasNav) next()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, list, hasNav])
 
   const rarityClass = `r-${card.rarity.replace(/\s+/g, '-')}`
   const stats: Array<[string, string | number | undefined]> = [
@@ -32,6 +58,19 @@ export function CardModal({ card, ownedCount, onClose }: Props) {
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
+      {hasNav && (
+        <button
+          className="modal-nav modal-nav--prev"
+          onClick={(e) => {
+            e.stopPropagation()
+            prev()
+          }}
+          aria-label="Carte précédente"
+        >
+          ‹
+        </button>
+      )}
+
       <div
         className="modal"
         onClick={(e) => e.stopPropagation()}
@@ -63,16 +102,51 @@ export function CardModal({ card, ownedCount, onClose }: Props) {
             </dl>
             {card.desc && <p className="modal__desc muted">{card.desc}</p>}
             <div className="modal__footer">
-              <span className="modal__owned">Possédée ×{ownedCount}</span>
+              <span className="modal__owned">
+                {count > 0 ? `Possédée ×${count}` : 'Non possédée'}
+              </span>
               {card.price && Number(card.price) > 0 && (
                 <span className="modal__price" title="Prix indicatif (marché)">
                   ~${card.price}
                 </span>
               )}
             </div>
+
+            <div className="modal__craft">
+              {count === 0 ? (
+                <button
+                  disabled={dust < craftCost}
+                  onClick={() => onCraft(card)}
+                  title={`Fabriquer cette carte pour ${craftCost} poussière`}
+                >
+                  Fabriquer · {craftCost} ✨
+                </button>
+              ) : count > 1 ? (
+                <button className="secondary" onClick={() => onRecycle(card)}>
+                  Recycler 1 · +{DUST_VALUE[card.rarity]} ✨
+                </button>
+              ) : (
+                <span className="muted modal__craft-hint">
+                  Recyclable dès que tu en as un double.
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {hasNav && (
+        <button
+          className="modal-nav modal-nav--next"
+          onClick={(e) => {
+            e.stopPropagation()
+            next()
+          }}
+          aria-label="Carte suivante"
+        >
+          ›
+        </button>
+      )}
     </div>
   )
 }
