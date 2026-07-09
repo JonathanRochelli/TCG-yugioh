@@ -73,7 +73,13 @@ export function normalizeRarity(raw: string | undefined): Rarity {
   const s = raw.toLowerCase()
 
   // Ordre important : tester les plus spécifiques d'abord.
-  if (s.includes('secret') || s.includes('ghost') || s.includes('ultimate')) {
+  // (anglais + variantes françaises éventuelles : secrète, commune…)
+  if (
+    s.includes('secret') ||
+    s.includes('secrète') ||
+    s.includes('ghost') ||
+    s.includes('ultimate')
+  ) {
     return 'Secret Rare'
   }
   if (s.includes('ultra')) return 'Ultra Rare'
@@ -87,5 +93,6 @@ export function normalizeRarity(raw: string | undefined): Rarity {
     return 'Common'
   }
   if (s.includes('rare')) return 'Rare'
+  if (s.includes('commun')) return 'Common' // commune / commun
   return 'Common'
 }

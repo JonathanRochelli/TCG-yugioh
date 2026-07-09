@@ -4,7 +4,9 @@ import { FALLBACK_CARDS } from '../data/fallbackCards'
 import { CURATED_SETS } from '../data/curatedSets'
 
 const API_BASE = 'https://db.ygoprodeck.com/api/v7'
-const CACHE_PREFIX = 'ygo.set.v1:'
+/** Langue des données de cartes (noms, descriptions, attributs). */
+const API_LANG = 'fr'
+const CACHE_PREFIX = 'ygo.set.v2.fr:'
 const SETS_CACHE_KEY = 'ygo.allSets.v1'
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7 // 7 jours
 const FETCH_TIMEOUT_MS = 8000 // au-delà : repli hors-ligne
@@ -168,7 +170,7 @@ export async function fetchSetCards(setName: string): Promise<FetchResult> {
   }
 
   try {
-    const url = `${API_BASE}/cardinfo.php?cardset=${encodeURIComponent(setName)}`
+    const url = `${API_BASE}/cardinfo.php?language=${API_LANG}&cardset=${encodeURIComponent(setName)}`
     // Timeout : ne jamais bloquer l'UI si le réseau ne répond pas.
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
