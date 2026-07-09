@@ -14,22 +14,22 @@ export const FOIL_RARITIES: Rarity[] = RARITY_ORDER.filter((r) => r !== 'Common'
 
 /**
  * Poids relatifs du slot rare d'un paquet (un seul slot par paquet de 9).
- * Courbe équilibrée : le Rare reste la norme, les hauts tiers sont rares.
+ * Calé sur les taux du slot « hit » d'un booster Pokémon moderne.
  *
  * Probabilités par PAQUET qui en résultent :
- *   Rare        ≈ 78 %
- *   Super Rare  ≈ 16 %
- *   Ultra Rare  ≈ 5 %
- *   Secret Rare ≈ 1 %
- * → Super Rare ou mieux ≈ 22 % ; Ultra ou mieux ≈ 6 % ; Secret ≈ 1 %.
+ *   Rare        ≈ 63 %
+ *   Super Rare  ≈ 22 %
+ *   Ultra Rare  ≈ 12 %   (≈ 1 paquet sur 8)
+ *   Secret Rare ≈ 3 %    (≈ 1 paquet sur 33)
+ * → Super Rare ou mieux ≈ 37 % ; Ultra ou mieux ≈ 15 %.
  * (Le pity timer garantit en plus une Ultra/Secret tous les 10 paquets secs.)
  */
 export const FOIL_WEIGHTS: Record<Rarity, number> = {
   Common: 0, // jamais dans le slot foil
-  Rare: 78,
-  'Super Rare': 16,
-  'Ultra Rare': 5,
-  'Secret Rare': 1,
+  Rare: 63,
+  'Super Rare': 22,
+  'Ultra Rare': 12,
+  'Secret Rare': 3,
 }
 
 /**
