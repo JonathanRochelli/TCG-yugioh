@@ -105,14 +105,14 @@ export function Header({
           className={view === 'sets' ? 'active' : ''}
           onClick={() => onNavigate('sets')}
         >
-          <span className="tab-icon">🛒</span>
+          <span className="tab-icon">🏺</span>
           <span>Boutique</span>
         </button>
         <button
           className={view === 'collection' ? 'active' : ''}
           onClick={() => onNavigate('collection')}
         >
-          <span className="tab-icon">📚</span>
+          <span className="tab-icon">📜</span>
           <span>Collection</span>
           {collectionCount > 0 && <span className="tab-badge">{collectionCount}</span>}
         </button>
@@ -120,7 +120,7 @@ export function Header({
           className={view === 'profile' ? 'active' : ''}
           onClick={() => onNavigate('profile')}
         >
-          <span className="tab-icon">👤</span>
+          <span className="tab-icon">☥</span>
           <span>Profil</span>
         </button>
       </nav>
