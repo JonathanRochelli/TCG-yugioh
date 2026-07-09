@@ -1333,6 +1333,11 @@ button:focus-visible,
 .header {
   background: linear-gradient(180deg, rgba(10, 12, 26, 0.9), rgba(8, 10, 21, 0.78));
   border-bottom: none;
+  /* Pleine largeur (le fond atteint les bords de l'écran, contenu aligné) */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-left: calc(50vw - 50%);
+  padding-right: calc(50vw - 50%);
 }
 .header::after {
   content: '';
