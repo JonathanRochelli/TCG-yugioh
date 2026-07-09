@@ -13,15 +13,23 @@ export const RARITY_ORDER: Rarity[] = [
 export const FOIL_RARITIES: Rarity[] = RARITY_ORDER.filter((r) => r !== 'Common')
 
 /**
- * Poids relatifs du slot rare d'un paquet.
- * Plus la rareté est haute, plus elle est improbable.
+ * Poids relatifs du slot rare d'un paquet (un seul slot par paquet de 9).
+ * Courbe équilibrée : le Rare reste la norme, les hauts tiers sont rares.
+ *
+ * Probabilités par PAQUET qui en résultent :
+ *   Rare        ≈ 78 %
+ *   Super Rare  ≈ 16 %
+ *   Ultra Rare  ≈ 5 %
+ *   Secret Rare ≈ 1 %
+ * → Super Rare ou mieux ≈ 22 % ; Ultra ou mieux ≈ 6 % ; Secret ≈ 1 %.
+ * (Le pity timer garantit en plus une Ultra/Secret tous les 10 paquets secs.)
  */
 export const FOIL_WEIGHTS: Record<Rarity, number> = {
   Common: 0, // jamais dans le slot foil
-  Rare: 60,
-  'Super Rare': 25,
-  'Ultra Rare': 12,
-  'Secret Rare': 3,
+  Rare: 78,
+  'Super Rare': 16,
+  'Ultra Rare': 5,
+  'Secret Rare': 1,
 }
 
 /**

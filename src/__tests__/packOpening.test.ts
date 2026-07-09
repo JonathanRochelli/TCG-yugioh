@@ -68,13 +68,15 @@ describe('generatePack', () => {
       'Ultra Rare': 0,
       'Secret Rare': 0,
     }
-    const N = 4000
+    const N = 6000
     for (let i = 0; i < N; i++) {
       const foil = generatePack(cards, seeded(i))[PACK_SIZE - 1]
       counts[foil.rarity]++
     }
-    // Rare doit être plus fréquent qu'Ultra Rare dans le slot foil.
-    expect(counts.Rare).toBeGreaterThan(counts['Ultra Rare'])
+    // La courbe doit être strictement décroissante : Rare > Super > Ultra > Secret.
+    expect(counts.Rare).toBeGreaterThan(counts['Super Rare'])
+    expect(counts['Super Rare']).toBeGreaterThan(counts['Ultra Rare'])
+    expect(counts['Ultra Rare']).toBeGreaterThan(counts['Secret Rare'])
   })
 })
 
