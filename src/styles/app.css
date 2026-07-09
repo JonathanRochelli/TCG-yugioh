@@ -1332,7 +1332,7 @@ button:focus-visible,
 /* En-tête : filet doré scintillant + emblème rayonnant */
 .header {
   background: linear-gradient(180deg, rgba(10, 12, 26, 0.9), rgba(8, 10, 21, 0.78));
-  border-bottom: none;
+  border-bottom: 1px solid rgba(214, 178, 92, 0.28);
   /* Pleine largeur (le fond atteint les bords de l'écran, contenu aligné) */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
@@ -1460,6 +1460,76 @@ button:focus-visible,
 .banner--info {
   background: rgba(47, 182, 173, 0.1);
   border-color: rgba(47, 182, 173, 0.4);
+}
+
+/* ============================ Barre d'onglets mobile ============================ */
+.mobile-tabs {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  /* Nav du haut masquée : la barre d'onglets du bas prend le relais */
+  .header__nav {
+    display: none;
+  }
+  .app {
+    padding-bottom: 88px;
+  }
+  .toast-host {
+    bottom: 96px;
+  }
+
+  .mobile-tabs {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    gap: 4px;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: rgba(10, 12, 26, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-strong);
+  }
+  .mobile-tabs button {
+    position: relative;
+    flex: 1;
+    background: none;
+    border: none;
+    box-shadow: none;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 0;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .mobile-tabs button.active {
+    color: var(--accent);
+  }
+  .mobile-tabs .tab-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(230, 194, 100, 0.25));
+  }
+  .mobile-tabs .tab-badge {
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 28px);
+    background: var(--accent-2);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    border-radius: 999px;
+    padding: 0 0.4em;
+    min-width: 1.2em;
+    text-align: center;
+  }
 }
 
 /* ============================ Responsive / mobile ============================ */

@@ -34,7 +34,8 @@ export function Header({
   }
 
   return (
-    <header className="header">
+    <>
+      <header className="header">
       <div className="header__brand" onClick={onGoHome}>
         <span className="header__emblem">𓂀</span>
         <div>
@@ -96,6 +97,33 @@ export function Header({
           ⚙️
         </button>
       </div>
-    </header>
+      </header>
+
+      {/* Barre d'onglets mobile (fixée en bas, hors du header) */}
+      <nav className="mobile-tabs">
+        <button
+          className={view === 'sets' ? 'active' : ''}
+          onClick={() => onNavigate('sets')}
+        >
+          <span className="tab-icon">🛒</span>
+          <span>Boutique</span>
+        </button>
+        <button
+          className={view === 'collection' ? 'active' : ''}
+          onClick={() => onNavigate('collection')}
+        >
+          <span className="tab-icon">📚</span>
+          <span>Collection</span>
+          {collectionCount > 0 && <span className="tab-badge">{collectionCount}</span>}
+        </button>
+        <button
+          className={view === 'profile' ? 'active' : ''}
+          onClick={() => onNavigate('profile')}
+        >
+          <span className="tab-icon">👤</span>
+          <span>Profil</span>
+        </button>
+      </nav>
+    </>
   )
 }
