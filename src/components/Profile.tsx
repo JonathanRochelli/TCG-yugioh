@@ -16,10 +16,8 @@ export function Profile({ collection }: Props) {
 
   const completedSets = useMemo(
     () =>
-      CURATED_SETS.filter((s) => {
-        const { owned, size } = setProgress(s.apiName, collection)
-        return size > 0 && owned >= size
-      }).length,
+      CURATED_SETS.filter((s) => setProgress(s.apiName, collection).complete)
+        .length,
     [collection],
   )
 

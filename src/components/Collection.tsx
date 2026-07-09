@@ -90,14 +90,14 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
       {/* Progression par set (clic = filtrer) */}
       <div className="progress-row">
         {CURATED_SETS.map((set) => {
-          const { owned, size } = setProgress(set.apiName, collection)
-          const pct = size > 0 ? Math.min(100, Math.round((owned / size) * 100)) : 0
+          const { owned, size, pct } = setProgress(set.apiName, collection)
+          const total = Math.max(size, owned)
           return (
             <button
               key={set.apiName}
               className={`progress-pill ${setFilter === set.apiName ? 'progress-pill--active' : ''}`}
               onClick={() => setSetFilter(setFilter === set.apiName ? 'all' : set.apiName)}
-              title={`${owned}/${size} cartes`}
+              title={`${owned}/${total} cartes`}
             >
               <span className="progress-pill__label">
                 {set.emblem} {set.label}
@@ -105,9 +105,7 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
               <span className="progress-pill__bar">
                 <span style={{ width: `${pct}%` }} />
               </span>
-              <span className="progress-pill__pct">
-                {size > 0 ? `${pct}%` : `${owned}`}
-              </span>
+              <span className="progress-pill__pct">{pct}%</span>
             </button>
           )
         })}

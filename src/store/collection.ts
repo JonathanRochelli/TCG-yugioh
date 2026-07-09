@@ -49,18 +49,37 @@ export function addCardTo(
 }
 
 /**
- * Progression d'un set : nombre de cartes du set connu réellement possédées
- * (borné par la taille du set) et taille du set. `owned` ne peut pas dépasser
- * `size`, ce qui garantit un pourcentage ≤ 100 %.
+ * Progression d'un set, robuste au cache manquant.
+ *
+ * - `owned` = max(cartes du set connu possédées, cartes possédées portant le
+ *   nom du set) → jamais 0 si tu possèdes des cartes du set.
+ * - `pct` utilise un dénominateur ≥ `owned` → toujours entre 0 et 100 %.
+ * - `complete` = true seulement si toutes les cartes du set CONNU sont
+ *   possédées (évite les fausses complétions sur le jeu de secours).
  */
 export function setProgress(
   setName: string,
   collection: CollectionState,
-): { owned: number; size: number } {
+): { owned: number; size: number; pct: number; complete: boolean } {
   const known = getKnownSetCards(setName)
-  let owned = 0
-  for (const c of known) if (collection[cardKey(c)]) owned++
-  return { owned, size: known.length }
+  const size = known.length
+
+  let inKnown = 0
+  for (const c of known) if (collection[cardKey(c)]) inKnown++
+
+  let byName = 0
+  for (const key of Object.keys(collection)) {
+    if (collection[key].card.setName === setName) byName++
+  }
+
+  const owned = Math.max(inKnown, byName)
+  const denom = Math.max(size, owned, 1)
+  return {
+    owned,
+    size,
+    pct: Math.round((owned / denom) * 100),
+    complete: size > 0 && inKnown >= size,
+  }
 }
 
 export interface CollectionStore {
