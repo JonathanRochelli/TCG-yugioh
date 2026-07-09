@@ -1099,6 +1099,90 @@
   white-space: nowrap;
 }
 
+/* ============================ Polish design ============================ */
+/* En-tête collant translucide */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(11, 14, 23, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+
+/* Titres de section avec accent */
+.section-head h1 {
+  display: inline-block;
+}
+.section-head h1::after {
+  content: '';
+  display: block;
+  width: 52px;
+  height: 3px;
+  margin-top: 8px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+/* Survol des cartes de la boutique */
+.pack-card {
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.pack-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: var(--shadow);
+}
+
+/* Galerie de boosters (catalogue) */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 22px;
+}
+.gallery-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gallery-item__name {
+  font-weight: 800;
+  text-align: center;
+  font-size: 0.95rem;
+}
+.pack--gallery {
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.pack--gallery:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: var(--shadow);
+}
+
+/* Lisibilité des puces de rareté posées sur une image */
+.coll-card__rarity,
+.reveal__badges .rarity-chip {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* Focus visible (accessibilité) */
+button:focus-visible,
+.search:focus-visible,
+.select:focus-visible,
+.seg:focus-visible,
+.reveal:focus-visible,
+.coll-card:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
 /* ============================ Responsive / mobile ============================ */
 html,
 body {
