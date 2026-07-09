@@ -40,6 +40,44 @@ const ATTRIBUTE_FR: Record<string, string> = {
   DIVINE: 'DIVIN',
 }
 
+const RACE_FR: Record<string, string> = {
+  // Types de monstres
+  Aqua: 'Aqua',
+  Beast: 'Bête',
+  'Beast-Warrior': 'Bête-Guerrier',
+  'Creator-God': 'Dieu Créateur',
+  Cyberse: 'Cyberse',
+  Dinosaur: 'Dinosaure',
+  'Divine-Beast': 'Bête Divine',
+  Dragon: 'Dragon',
+  Fairy: 'Elfe',
+  Fiend: 'Démon',
+  Fish: 'Poisson',
+  Illusion: 'Illusion',
+  Insect: 'Insecte',
+  Machine: 'Machine',
+  Plant: 'Plante',
+  Psychic: 'Psychique',
+  Pyro: 'Pyro',
+  Reptile: 'Reptile',
+  Rock: 'Rocher',
+  'Sea Serpent': 'Serpent de Mer',
+  Spellcaster: 'Magicien',
+  Thunder: 'Tonnerre',
+  Warrior: 'Guerrier',
+  'Winged Beast': 'Bête Ailée',
+  Wyrm: 'Wyrm',
+  Zombie: 'Zombie',
+  // Propriétés des Magies / Pièges
+  Normal: 'Normale',
+  Continuous: 'Continue',
+  Equip: 'Équipement',
+  'Quick-Play': 'Jeu-Rapide',
+  Field: 'Terrain',
+  Ritual: 'Rituelle',
+  Counter: 'Contre',
+}
+
 const RARITY_FR: Record<Rarity, string> = {
   Common: 'Commune',
   Rare: 'Rare',
@@ -64,6 +102,12 @@ export function translateType(type: string | undefined): string {
 export function translateAttribute(attr: string | undefined): string {
   if (!attr) return ''
   return ATTRIBUTE_FR[attr.toUpperCase()] ?? attr
+}
+
+/** Traduit la race / propriété d'une carte (inchangée si inconnue). */
+export function translateRace(race: string | undefined): string {
+  if (!race) return ''
+  return RACE_FR[race] ?? race
 }
 
 /** Libellé français d'une rareté (pour l'affichage). */

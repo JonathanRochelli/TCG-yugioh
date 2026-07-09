@@ -4,7 +4,6 @@ import { Header } from './components/Header'
 import { SetSelect } from './components/SetSelect'
 import { PackOpening } from './components/PackOpening'
 import { Collection } from './components/Collection'
-import { Catalog } from './components/Catalog'
 import { Profile } from './components/Profile'
 import { CardModal } from './components/CardModal'
 import { SettingsModal } from './components/SettingsModal'
@@ -31,7 +30,7 @@ import { CURATED_SETS } from './data/curatedSets'
 import { cardKey, useCollection } from './store/collection'
 import './styles/app.css'
 
-export type View = 'sets' | 'opening' | 'collection' | 'catalog' | 'profile'
+export type View = 'sets' | 'opening' | 'collection' | 'profile'
 
 interface OpenedPack {
   set: SetDef
@@ -175,10 +174,6 @@ export default function App() {
           loadingSet={loadingSet}
           onOpen={openPacks}
         />
-      )}
-
-      {view === 'catalog' && (
-        <Catalog onOpen={openPacks} loadingSet={loadingSet} />
       )}
 
       {view === 'opening' && opened && (

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
-import { rarityLabel, translateAttribute, translateType } from '../game/i18n'
+import { rarityLabel, translateAttribute, translateRace, translateType } from '../game/i18n'
 import { CardArt } from './CardArt'
 import { Tilt } from './Tilt'
 
@@ -24,7 +24,7 @@ export function CardModal({ card, ownedCount, onClose }: Props) {
   const stats: Array<[string, string | number | undefined]> = [
     ['Type', translateType(card.type)],
     ['Attribut', translateAttribute(card.attribute)],
-    ['Race', card.race],
+    ['Race', translateRace(card.race)],
     ['Niveau', card.level],
     ['ATK', card.atk],
     ['DEF', card.def],
