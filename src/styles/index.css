@@ -1,26 +1,45 @@
 :root {
-  /* Palette "duel" sombre */
-  --bg: #0b0e17;
-  --bg-elev: #151a2b;
-  --bg-elev-2: #1e2540;
-  --border: #2c3557;
-  --text: #e9ecf5;
-  --text-dim: #9aa3c0;
-  --accent: #f5c542; /* or Millénium */
-  --accent-2: #7b5cff; /* violet mystique */
-  --danger: #ff5470;
-  --ok: #34d399;
+  /* ===== Palette « Égypte antique » : lapis-lazuli, or, faïence ===== */
+  --bg: #080a15; /* nuit du désert */
+  --bg-2: #0c1024;
+  --bg-elev: #14152a; /* lapis profond */
+  --bg-elev-2: #1e2144;
+  --border: rgba(214, 178, 92, 0.22); /* fin liseré doré */
+  --border-strong: rgba(214, 178, 92, 0.45);
+  --text: #f3ead2; /* ivoire / papyrus */
+  --text-dim: #b7a67c; /* or patiné */
 
-  /* Couleurs de rareté */
-  --r-common: #b6bdd6;
-  --r-rare: #5b8dff;
-  --r-super: #35d0c0;
-  --r-ultra: #ffb020;
-  --r-secret: #c86bff;
+  /* Or */
+  --gold: #d8b45a;
+  --gold-bright: #ffe9a8;
+  --gold-deep: #a9781f;
+  --accent: #e6c264; /* or Millénium */
+  --accent-2: #2fb6ad; /* turquoise faïence */
+  --carnelian: #c94f37; /* cornaline */
+
+  --danger: #d1495b;
+  --ok: #3aa88b;
+
+  /* Couleurs de rareté (chaleureuses) */
+  --r-common: #cbb994; /* grès */
+  --r-rare: #5b86e0; /* lapis clair */
+  --r-super: #2fb6ad; /* turquoise */
+  --r-ultra: #f0b429; /* or vif */
+  --r-secret: #c86bff; /* améthyste */
 
   --radius: 12px;
   --card-radius: 6px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  --gold-line: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold-deep),
+    var(--gold-bright),
+    var(--gold-deep),
+    transparent
+  );
+
+  --font-display: 'Cinzel', 'Trajan Pro', 'Times New Roman', Georgia, serif;
 
   color-scheme: dark;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
@@ -39,11 +58,32 @@ body,
 
 body {
   margin: 0;
-  background:
-    radial-gradient(1200px 600px at 50% -10%, #1a2140 0%, transparent 60%),
-    var(--bg);
   color: var(--text);
   min-height: 100vh;
+  background:
+    radial-gradient(1100px 620px at 50% -8%, rgba(230, 194, 100, 0.14), transparent 60%),
+    radial-gradient(900px 700px at 50% 120%, rgba(47, 182, 173, 0.08), transparent 60%),
+    linear-gradient(180deg, var(--bg-2), var(--bg));
+  background-attachment: fixed;
+}
+
+/* Motif hiéroglyphique subtil (losanges façon faïence) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54' viewBox='0 0 54 54'%3E%3Cg fill='none' stroke='%23e6c264' stroke-width='1'%3E%3Cpath d='M27 3 L51 27 L27 51 L3 27 Z'/%3E%3C/g%3E%3Ccircle cx='27' cy='27' r='2.4' fill='%23e6c264'/%3E%3C/svg%3E");
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
 }
 
 h1,
@@ -51,31 +91,41 @@ h2,
 h3 {
   margin: 0 0 0.4em;
   line-height: 1.15;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
 }
 
 a {
   color: var(--accent);
 }
 
+/* Boutons : or gravé */
 button {
   font: inherit;
   cursor: pointer;
-  border: none;
+  border: 1px solid var(--gold-deep);
   border-radius: var(--radius);
   padding: 0.7em 1.2em;
   font-weight: 700;
-  color: #1a1408;
-  background: linear-gradient(180deg, #ffd766, var(--accent));
+  letter-spacing: 0.02em;
+  color: #241a06;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold) 55%, var(--gold-deep));
   transition:
     transform 0.08s ease,
     filter 0.15s ease,
+    box-shadow 0.15s ease,
     opacity 0.15s ease;
-  box-shadow: 0 6px 18px rgba(245, 197, 66, 0.25);
+  box-shadow:
+    0 6px 18px rgba(169, 120, 31, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 button:hover:not(:disabled) {
   filter: brightness(1.06);
   transform: translateY(-1px);
+  box-shadow:
+    0 10px 24px rgba(169, 120, 31, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 button:active:not(:disabled) {
@@ -83,34 +133,28 @@ button:active:not(:disabled) {
 }
 
 button:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
-  filter: grayscale(0.4);
+  filter: grayscale(0.5);
 }
 
 button.secondary {
   color: var(--text);
-  background: var(--bg-elev-2);
-  box-shadow: none;
-  border: 1px solid var(--border);
-}
-
-.app {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 20px 80px;
+  background: linear-gradient(180deg, var(--bg-elev-2), var(--bg-elev));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-strong);
 }
 
 .muted {
   color: var(--text-dim);
 }
 
-/* Utilitaire pour badges de rareté */
+/* Badges de rareté */
 .rarity-chip {
   display: inline-block;
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 0.18em 0.55em;
   border-radius: 999px;
