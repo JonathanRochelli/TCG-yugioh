@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Card, CollectionState } from '../types'
 import { STARTING_COINS } from '../game/economy'
+import { getKnownSetCards } from '../api/ygoprodeck'
 
 const COLLECTION_KEY = 'ygo.collection.v1'
 const COINS_KEY = 'ygo.coins.v2'
@@ -32,6 +33,8 @@ function loadCoins(): number {
 
 /**
  * Ajoute une carte à un état de collection (pur) et renvoie un NOUVEL état.
+ * En cas de doublon, on conserve la version la plus récente de la carte
+ * (utile pour que les données FR remplacent d'anciennes données EN).
  */
 export function addCardTo(
   state: CollectionState,
@@ -41,10 +44,23 @@ export function addCardTo(
   const existing = state[key]
   return {
     ...state,
-    [key]: existing
-      ? { card: existing.card, count: existing.count + 1 }
-      : { card, count: 1 },
+    [key]: existing ? { card, count: existing.count + 1 } : { card, count: 1 },
   }
+}
+
+/**
+ * Progression d'un set : nombre de cartes du set connu réellement possédées
+ * (borné par la taille du set) et taille du set. `owned` ne peut pas dépasser
+ * `size`, ce qui garantit un pourcentage ≤ 100 %.
+ */
+export function setProgress(
+  setName: string,
+  collection: CollectionState,
+): { owned: number; size: number } {
+  const known = getKnownSetCards(setName)
+  let owned = 0
+  for (const c of known) if (collection[cardKey(c)]) owned++
+  return { owned, size: known.length }
 }
 
 export interface CollectionStore {

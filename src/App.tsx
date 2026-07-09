@@ -9,7 +9,7 @@ import { Profile } from './components/Profile'
 import { CardModal } from './components/CardModal'
 import { SettingsModal } from './components/SettingsModal'
 import { useToast } from './components/Toast'
-import { fetchSetCards, knownSetSize } from './api/ygoprodeck'
+import { fetchSetCards, getKnownSetCards } from './api/ygoprodeck'
 import { generatePack } from './game/packOpening'
 import { PACK_COST, dustFromPack } from './game/economy'
 import {
@@ -130,12 +130,8 @@ export default function App() {
       // --- Stats, succès et récompenses de complétion ---
       const stats = recordOpening(n, all)
       const completed = CURATED_SETS.filter((s) => {
-        const size = knownSetSize(s.apiName)
-        if (size <= 0) return false
-        const prefix = `${s.apiName}::`
-        let owned = 0
-        for (const k of seen) if (k.startsWith(prefix)) owned++
-        return owned >= size
+        const known = getKnownSetCards(s.apiName)
+        return known.length > 0 && known.every((c) => seen.has(cardKey(c)))
       }).map((s) => s.apiName)
 
       const setRes = rewardNewlyCompletedSets(completed)

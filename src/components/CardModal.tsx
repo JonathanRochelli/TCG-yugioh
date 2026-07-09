@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
+import { rarityLabel, translateAttribute, translateType } from '../game/i18n'
 import { CardArt } from './CardArt'
 import { Tilt } from './Tilt'
 
@@ -21,8 +22,8 @@ export function CardModal({ card, ownedCount, onClose }: Props) {
 
   const rarityClass = `r-${card.rarity.replace(/\s+/g, '-')}`
   const stats: Array<[string, string | number | undefined]> = [
-    ['Type', card.type],
-    ['Attribut', card.attribute],
+    ['Type', translateType(card.type)],
+    ['Attribut', translateAttribute(card.attribute)],
     ['Race', card.race],
     ['Niveau', card.level],
     ['ATK', card.atk],
@@ -47,7 +48,7 @@ export function CardModal({ card, ownedCount, onClose }: Props) {
           <div className="modal__info">
             <h2>{card.name}</h2>
             <div className="modal__chips">
-              <span className={`rarity-chip ${rarityClass}`}>{card.rarity}</span>
+              <span className={`rarity-chip ${rarityClass}`}>{rarityLabel(card.rarity)}</span>
               <span className="rarity-chip r-Common">{card.setName}</span>
             </div>
             <dl className="modal__stats">

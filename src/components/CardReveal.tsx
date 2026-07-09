@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
+import { rarityLabel } from '../game/i18n'
 import { CardArt } from './CardArt'
 import { CARD_BACK, CARD_BACK_FALLBACK } from '../config/customArt'
 
@@ -65,7 +66,7 @@ export function CardReveal({
           <CardArt card={card} small />
           {isNew && <span className="badge badge--new">NOUVEAU</span>}
           <div className="reveal__badges">
-            <span className={`rarity-chip ${rarityClass}`}>{card.rarity}</span>
+            <span className={`rarity-chip ${rarityClass}`}>{rarityLabel(card.rarity)}</span>
           </div>
         </div>
       </div>

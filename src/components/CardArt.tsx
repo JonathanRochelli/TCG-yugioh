@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Card } from '../types'
+import { translateType } from '../game/i18n'
 
 interface Props {
   card: Card
@@ -19,7 +20,7 @@ export function CardArt({ card, small }: Props) {
     return (
       <div className="card-art card-art--placeholder">
         <span className="card-art__name">{card.name}</span>
-        <span className="card-art__meta">{card.type}</span>
+        <span className="card-art__meta">{translateType(card.type)}</span>
       </div>
     )
   }

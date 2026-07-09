@@ -3,7 +3,7 @@ import type { CollectionState } from '../types'
 import { getStats } from '../game/stats'
 import { ACHIEVEMENTS, unlockedIds } from '../game/achievements'
 import { CURATED_SETS } from '../data/curatedSets'
-import { knownSetSize } from '../api/ygoprodeck'
+import { setProgress } from '../store/collection'
 
 interface Props {
   collection: CollectionState
@@ -17,11 +17,10 @@ export function Profile({ collection }: Props) {
   const completedSets = useMemo(
     () =>
       CURATED_SETS.filter((s) => {
-        const size = knownSetSize(s.apiName)
-        const owned = entries.filter((e) => e.card.setName === s.apiName).length
+        const { owned, size } = setProgress(s.apiName, collection)
         return size > 0 && owned >= size
       }).length,
-    [entries],
+    [collection],
   )
 
   const totalCopies = entries.reduce((s, e) => s + e.count, 0)

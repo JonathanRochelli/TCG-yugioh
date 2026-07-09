@@ -3,6 +3,7 @@ import type { Card, SetDef } from '../types'
 import { CardReveal } from './CardReveal'
 import { BoosterPack } from './BoosterPack'
 import { rarityRank } from '../game/rarity'
+import { rarityLabel } from '../game/i18n'
 import { playFlip, playRareJingle, playTear } from '../game/sound'
 import { burstConfetti } from '../game/confetti'
 
@@ -143,7 +144,7 @@ export function PackOpening({
             <span className="muted">Meilleure carte</span>
             <strong>{pack[best].name}</strong>
             <span className={`rarity-chip r-${pack[best].rarity.replace(/\s+/g, '-')}`}>
-              {pack[best].rarity}
+              {rarityLabel(pack[best].rarity)}
             </span>
           </div>
           <div className="recap__stats muted">

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import type { Card, CollectionState } from '../types'
 import { CURATED_SETS } from '../data/curatedSets'
-import { getKnownSetCards, knownSetSize } from '../api/ygoprodeck'
+import { getKnownSetCards } from '../api/ygoprodeck'
 import { RARITY_ORDER, rarityRank } from '../game/rarity'
-import { cardKey } from '../store/collection'
+import { rarityLabel } from '../game/i18n'
+import { cardKey, setProgress } from '../store/collection'
 import { CardArt } from './CardArt'
 
 interface Props {
@@ -89,9 +90,8 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
       {/* Progression par set (clic = filtrer) */}
       <div className="progress-row">
         {CURATED_SETS.map((set) => {
-          const size = knownSetSize(set.apiName)
-          const owned = entries.filter((e) => e.card.setName === set.apiName).length
-          const pct = size > 0 ? Math.round((owned / size) * 100) : 0
+          const { owned, size } = setProgress(set.apiName, collection)
+          const pct = size > 0 ? Math.min(100, Math.round((owned / size) * 100)) : 0
           return (
             <button
               key={set.apiName}
@@ -177,7 +177,7 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
                 <CardArt card={it.card} small />
                 {it.count > 1 && <span className="coll-card__count">×{it.count}</span>}
                 <span className={`rarity-chip coll-card__rarity ${rarityClass}`}>
-                  {it.card.rarity}
+                  {rarityLabel(it.card.rarity)}
                 </span>
               </div>
             )
@@ -194,7 +194,7 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
       <div className="legend">
         {RARITY_ORDER.map((r) => (
           <span key={r} className={`rarity-chip r-${r.replace(/\s+/g, '-')}`}>
-            {r}
+            {rarityLabel(r)}
           </span>
         ))}
       </div>
