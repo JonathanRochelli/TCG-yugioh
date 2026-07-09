@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Card, SetDef } from '../types'
 import { CardReveal } from './CardReveal'
 import { BoosterPack } from './BoosterPack'
 import { rarityRank } from '../game/rarity'
+import { playFlip, playRareJingle, playTear } from '../game/sound'
+import { burstConfetti } from '../game/confetti'
 
 interface Props {
   set: SetDef
@@ -36,6 +38,7 @@ export function PackOpening({
   const [phase, setPhase] = useState<Phase>('pack')
   const [tearing, setTearing] = useState(false)
   const [revealed, setRevealed] = useState<Set<number>>(new Set())
+  const feedbackDone = useRef(false)
 
   const allRevealed = revealed.size === pack.length
   const newCount = useMemo(() => newFlags.filter(Boolean).length, [newFlags])
@@ -51,14 +54,28 @@ export function PackOpening({
 
   function tear() {
     setTearing(true)
+    playTear()
     window.setTimeout(() => setPhase('reveal'), 1300)
   }
 
+  /** Confettis + jingle sur la meilleure carte du lot (une seule fois). */
+  function bestFeedback() {
+    if (feedbackDone.current) return
+    feedbackDone.current = true
+    const card = pack[best]
+    playRareJingle(card.rarity)
+    if (rarityRank(card.rarity) >= rarityRank('Ultra Rare')) burstConfetti()
+  }
+
   function reveal(i: number) {
+    if (!revealed.has(i)) playFlip()
+    if (i === best) bestFeedback()
     setRevealed((prev) => new Set(prev).add(i))
   }
 
   function revealAll() {
+    playFlip()
+    bestFeedback()
     setRevealed(new Set(pack.map((_, i) => i)))
   }
 

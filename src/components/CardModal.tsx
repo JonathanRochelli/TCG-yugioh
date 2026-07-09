@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
 import { CardArt } from './CardArt'
+import { Tilt } from './Tilt'
 
 interface Props {
   card: Card
@@ -39,10 +40,10 @@ export function CardModal({ card, ownedCount, onClose }: Props) {
           ✕
         </button>
         <div className="modal__body">
-          <div className={`modal__art ${isFoil(card.rarity) ? 'modal__art--foil' : ''}`}>
+          <Tilt className={`modal__art ${isFoil(card.rarity) ? 'modal__art--foil' : ''}`}>
             {isFoil(card.rarity) && <div className="reveal__holo" />}
             <CardArt card={card} />
-          </div>
+          </Tilt>
           <div className="modal__info">
             <h2>{card.name}</h2>
             <div className="modal__chips">

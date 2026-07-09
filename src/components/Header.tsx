@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import type { View } from '../App'
+import { isMuted, setMuted } from '../game/sound'
 
 interface Props {
   coins: number
@@ -7,6 +9,7 @@ interface Props {
   view: View
   onNavigate: (view: View) => void
   collectionCount: number
+  onOpenSettings: () => void
 }
 
 export function Header({
@@ -16,7 +19,16 @@ export function Header({
   view,
   onNavigate,
   collectionCount,
+  onOpenSettings,
 }: Props) {
+  const [muted, setMutedState] = useState(isMuted())
+
+  function toggleSound() {
+    const next = !muted
+    setMuted(next)
+    setMutedState(next)
+  }
+
   return (
     <header className="header">
       <div className="header__brand" onClick={() => onNavigate('sets')}>
@@ -46,6 +58,12 @@ export function Header({
         >
           Collection {collectionCount > 0 && <span className="pill">{collectionCount}</span>}
         </button>
+        <button
+          className={view === 'profile' ? '' : 'secondary'}
+          onClick={() => onNavigate('profile')}
+        >
+          Profil
+        </button>
       </nav>
 
       <div className="header__stats">
@@ -53,15 +71,28 @@ export function Header({
           <span className="stat__icon">🪙</span>
           <span className="stat__value">{coins}</span>
         </div>
-        <div
-          className="stat"
-          title="Paquets restants aujourd'hui"
-        >
+        <div className="stat" title="Paquets restants aujourd'hui">
           <span className="stat__icon">📦</span>
           <span className="stat__value">
             {packsRemaining}/{maxPacks}
           </span>
         </div>
+        <button
+          className="icon-btn secondary"
+          onClick={toggleSound}
+          title={muted ? 'Activer le son' : 'Couper le son'}
+          aria-label="Son"
+        >
+          {muted ? '🔇' : '🔊'}
+        </button>
+        <button
+          className="icon-btn secondary"
+          onClick={onOpenSettings}
+          title="Sauvegarde / réglages"
+          aria-label="Réglages"
+        >
+          ⚙️
+        </button>
       </div>
     </header>
   )

@@ -5,9 +5,11 @@ import { SetSelect } from './components/SetSelect'
 import { PackOpening } from './components/PackOpening'
 import { Collection } from './components/Collection'
 import { Catalog } from './components/Catalog'
+import { Profile } from './components/Profile'
 import { CardModal } from './components/CardModal'
+import { SettingsModal } from './components/SettingsModal'
 import { useToast } from './components/Toast'
-import { fetchSetCards } from './api/ygoprodeck'
+import { fetchSetCards, knownSetSize } from './api/ygoprodeck'
 import { generatePack } from './game/packOpening'
 import { PACK_COST, dustFromPack } from './game/economy'
 import {
@@ -18,10 +20,18 @@ import {
 } from './game/dailyLimit'
 import { claimDailyBonus } from './game/dailyBonus'
 import { isPityDue, registerPack } from './game/pity'
+import { recordOpening } from './game/stats'
+import {
+  SET_COMPLETION_REWARD,
+  checkAchievements,
+  rewardNewlyCompletedSets,
+} from './game/achievements'
+import { playCoins } from './game/sound'
+import { CURATED_SETS } from './data/curatedSets'
 import { cardKey, useCollection } from './store/collection'
 import './styles/app.css'
 
-export type View = 'sets' | 'opening' | 'collection' | 'catalog'
+export type View = 'sets' | 'opening' | 'collection' | 'catalog' | 'profile'
 
 interface OpenedPack {
   set: SetDef
@@ -39,6 +49,7 @@ export default function App() {
   const [loadingSet, setLoadingSet] = useState<string | null>(null)
   const [opened, setOpened] = useState<OpenedPack | null>(null)
   const [inspecting, setInspecting] = useState<Card | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [remaining, setRemaining] = useState<number>(() => packsRemainingToday())
 
   const collectionCount = useMemo(
@@ -51,6 +62,7 @@ export default function App() {
     const bonus = claimDailyBonus()
     if (bonus > 0) {
       store.addCoins(bonus)
+      playCoins()
       notify(`Bonus quotidien : +${bonus} 🪙`, 'reward')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,6 +126,35 @@ export default function App() {
       if (guaranteed > 0) {
         notify(`Pity timer : carte rare garantie ✨`, 'reward')
       }
+
+      // --- Stats, succès et récompenses de complétion ---
+      const stats = recordOpening(n, all)
+      const completed = CURATED_SETS.filter((s) => {
+        const size = knownSetSize(s.apiName)
+        if (size <= 0) return false
+        const prefix = `${s.apiName}::`
+        let owned = 0
+        for (const k of seen) if (k.startsWith(prefix)) owned++
+        return owned >= size
+      }).map((s) => s.apiName)
+
+      const setRes = rewardNewlyCompletedSets(completed)
+      const achRes = checkAchievements({
+        stats,
+        uniqueCount: seen.size,
+        completedSets: completed.length,
+      })
+      const rewardTotal = setRes.reward + achRes.reward
+      if (rewardTotal > 0) {
+        store.addCoins(rewardTotal)
+        playCoins()
+      }
+      setRes.newly.forEach((name) =>
+        notify(`Set complété : ${name} (+${SET_COMPLETION_REWARD} 🪙)`, 'reward'),
+      )
+      achRes.newly.forEach((a) =>
+        notify(`Succès : ${a.label} (+${a.reward} 🪙)`, 'reward'),
+      )
     } finally {
       setLoadingSet(null)
     }
@@ -128,6 +169,7 @@ export default function App() {
         view={view}
         onNavigate={setView}
         collectionCount={collectionCount}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
 
       {view === 'sets' && (
@@ -165,6 +207,10 @@ export default function App() {
           onGoShop={() => setView('sets')}
         />
       )}
+
+      {view === 'profile' && <Profile collection={store.collection} />}
+
+      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
 
       {inspecting && (
         <CardModal
