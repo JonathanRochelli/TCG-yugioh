@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import type { Card, CollectionState } from '../types'
 import { CURATED_SETS } from '../data/curatedSets'
-import { knownSetSize } from '../api/ygoprodeck'
+import { getKnownSetCards, knownSetSize } from '../api/ygoprodeck'
 import { RARITY_ORDER, rarityRank } from '../game/rarity'
+import { cardKey } from '../store/collection'
 import { CardArt } from './CardArt'
 
 interface Props {
@@ -11,25 +12,59 @@ interface Props {
   onGoShop: () => void
 }
 
+type Ownership = 'owned' | 'missing'
+type SortKey = 'rarity' | 'atk' | 'name'
+type TypeFilter = 'all' | 'Monster' | 'Spell' | 'Trap'
+
+interface Item {
+  card: Card
+  count: number
+}
+
+function typeCategory(type: string): TypeFilter {
+  if (type.includes('Spell')) return 'Spell'
+  if (type.includes('Trap')) return 'Trap'
+  return 'Monster'
+}
+
 export function Collection({ collection, onInspect, onGoShop }: Props) {
   const entries = useMemo(() => Object.values(collection), [collection])
   const [setFilter, setSetFilter] = useState<string>('all')
   const [query, setQuery] = useState('')
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return entries
-      .filter((e) => setFilter === 'all' || e.card.setName === setFilter)
-      .filter((e) => !q || e.card.name.toLowerCase().includes(q))
-      .sort(
-        (a, b) =>
-          rarityRank(b.card.rarity) - rarityRank(a.card.rarity) ||
-          a.card.name.localeCompare(b.card.name),
-      )
-  }, [entries, setFilter, query])
+  const [ownership, setOwnership] = useState<Ownership>('owned')
+  const [sort, setSort] = useState<SortKey>('rarity')
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
 
   const totalUnique = entries.length
   const totalCopies = entries.reduce((s, e) => s + e.count, 0)
+
+  const items = useMemo<Item[]>(() => {
+    let base: Item[]
+    if (ownership === 'missing') {
+      if (setFilter === 'all') return []
+      const owned = new Set(Object.keys(collection))
+      base = getKnownSetCards(setFilter)
+        .filter((c) => !owned.has(cardKey(c)))
+        .map((c) => ({ card: c, count: 0 }))
+    } else {
+      base = entries.filter(
+        (e) => setFilter === 'all' || e.card.setName === setFilter,
+      )
+    }
+
+    const q = query.trim().toLowerCase()
+    return base
+      .filter((it) => typeFilter === 'all' || typeCategory(it.card.type) === typeFilter)
+      .filter((it) => !q || it.card.name.toLowerCase().includes(q))
+      .sort((a, b) => {
+        if (sort === 'atk') return (b.card.atk ?? -1) - (a.card.atk ?? -1)
+        if (sort === 'name') return a.card.name.localeCompare(b.card.name)
+        return (
+          rarityRank(b.card.rarity) - rarityRank(a.card.rarity) ||
+          a.card.name.localeCompare(b.card.name)
+        )
+      })
+  }, [entries, collection, setFilter, query, ownership, sort, typeFilter])
 
   if (totalUnique === 0) {
     return (
@@ -51,26 +86,22 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
         </p>
       </div>
 
-      {/* Progression par set */}
+      {/* Progression par set (clic = filtrer) */}
       <div className="progress-row">
         {CURATED_SETS.map((set) => {
           const size = knownSetSize(set.apiName)
-          const owned = entries.filter(
-            (e) => e.card.setName === set.apiName,
-          ).length
+          const owned = entries.filter((e) => e.card.setName === set.apiName).length
           const pct = size > 0 ? Math.round((owned / size) * 100) : 0
           return (
             <button
               key={set.apiName}
-              className={`progress-pill ${
-                setFilter === set.apiName ? 'progress-pill--active' : ''
-              }`}
-              onClick={() =>
-                setSetFilter(setFilter === set.apiName ? 'all' : set.apiName)
-              }
+              className={`progress-pill ${setFilter === set.apiName ? 'progress-pill--active' : ''}`}
+              onClick={() => setSetFilter(setFilter === set.apiName ? 'all' : set.apiName)}
               title={`${owned}/${size} cartes`}
             >
-              <span className="progress-pill__label">{set.emblem} {set.label}</span>
+              <span className="progress-pill__label">
+                {set.emblem} {set.label}
+              </span>
               <span className="progress-pill__bar">
                 <span style={{ width: `${pct}%` }} />
               </span>
@@ -82,48 +113,84 @@ export function Collection({ collection, onInspect, onGoShop }: Props) {
         })}
       </div>
 
-      <div className="toolbar">
+      {/* Barre d'outils : recherche, possédées/manquantes, tri, type */}
+      <div className="toolbar toolbar--wrap">
         <input
           className="search"
           placeholder="Rechercher une carte…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        {setFilter !== 'all' && (
-          <button className="secondary" onClick={() => setSetFilter('all')}>
-            Tous les sets
+        <div className="segmented">
+          <button
+            className={ownership === 'owned' ? 'seg seg--on' : 'seg'}
+            onClick={() => setOwnership('owned')}
+          >
+            Possédées
           </button>
-        )}
+          <button
+            className={ownership === 'missing' ? 'seg seg--on' : 'seg'}
+            onClick={() => setOwnership('missing')}
+          >
+            Manquantes
+          </button>
+        </div>
+        <select
+          className="select"
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortKey)}
+          aria-label="Trier par"
+        >
+          <option value="rarity">Rareté</option>
+          <option value="atk">ATK</option>
+          <option value="name">Nom</option>
+        </select>
+        <select
+          className="select"
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
+          aria-label="Filtrer par type"
+        >
+          <option value="all">Tous types</option>
+          <option value="Monster">Monstres</option>
+          <option value="Spell">Magies</option>
+          <option value="Trap">Pièges</option>
+        </select>
       </div>
 
-      <div className="collection-grid">
-        {filtered.map((entry) => {
-          const rarityClass = `r-${entry.card.rarity.replace(/\s+/g, '-')}`
-          return (
-            <div
-              key={`${entry.card.setName}-${entry.card.id}`}
-              className="coll-card"
-              onClick={() => onInspect(entry.card)}
-            >
-              <CardArt card={entry.card} small />
-              {entry.count > 1 && (
-                <span className="coll-card__count">×{entry.count}</span>
-              )}
-              <span className={`rarity-chip coll-card__rarity ${rarityClass}`}>
-                {entry.card.rarity}
-              </span>
-            </div>
-          )
-        })}
-      </div>
+      {ownership === 'missing' && setFilter === 'all' ? (
+        <p className="muted" style={{ textAlign: 'center', marginTop: 24 }}>
+          Choisis un set ci-dessus pour voir les cartes qu'il te reste à
+          obtenir.
+        </p>
+      ) : (
+        <div className="collection-grid">
+          {items.map((it) => {
+            const rarityClass = `r-${it.card.rarity.replace(/\s+/g, '-')}`
+            const missing = it.count === 0
+            return (
+              <div
+                key={`${it.card.setName}-${it.card.id}`}
+                className={`coll-card ${missing ? 'coll-card--missing' : ''}`}
+                onClick={() => onInspect(it.card)}
+              >
+                <CardArt card={it.card} small />
+                {it.count > 1 && <span className="coll-card__count">×{it.count}</span>}
+                <span className={`rarity-chip coll-card__rarity ${rarityClass}`}>
+                  {it.card.rarity}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
-      {filtered.length === 0 && (
+      {ownership !== 'missing' && items.length === 0 && (
         <p className="muted" style={{ textAlign: 'center', marginTop: 24 }}>
           Aucune carte ne correspond.
         </p>
       )}
 
-      {/* Ordre de rareté rappelé en légende */}
       <div className="legend">
         {RARITY_ORDER.map((r) => (
           <span key={r} className={`rarity-chip r-${r.replace(/\s+/g, '-')}`}>

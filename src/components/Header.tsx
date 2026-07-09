@@ -35,6 +35,12 @@ export function Header({
           Boutique
         </button>
         <button
+          className={view === 'catalog' ? '' : 'secondary'}
+          onClick={() => onNavigate('catalog')}
+        >
+          Catalogue
+        </button>
+        <button
           className={view === 'collection' ? '' : 'secondary'}
           onClick={() => onNavigate('collection')}
         >

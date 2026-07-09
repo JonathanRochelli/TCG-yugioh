@@ -1,0 +1,19 @@
+{
+  "name": "Yu-Gi-Oh Boosters",
+  "short_name": "YGO Boosters",
+  "description": "Ouvre des boosters et collectionne de vraies cartes Yu-Gi-Oh.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0e17",
+  "theme_color": "#0b0e17",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

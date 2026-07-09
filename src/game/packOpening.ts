@@ -1,5 +1,5 @@
 import type { Card, Rarity } from '../types'
-import { FOIL_WEIGHTS, isFoil } from './rarity'
+import { FOIL_WEIGHTS, HIGH_FOIL_WEIGHTS } from './rarity'
 
 /** Nombre de cartes par paquet. */
 export const PACK_SIZE = 9
@@ -28,25 +28,35 @@ export function groupByRarity(cards: Card[]): Record<Rarity, Card[]> {
 }
 
 /**
- * Choisit une rareté foil selon les poids configurés, en ne considérant
- * que les raretés effectivement présentes dans le set.
+ * Choisit une rareté selon des poids, en ne considérant que les raretés
+ * effectivement présentes dans le set (poids > 0 et cartes disponibles).
  */
-function pickFoilRarity(
+function pickRarityByWeight(
   groups: Record<Rarity, Card[]>,
   rng: Rng,
+  weights: Record<Rarity, number>,
 ): Rarity | null {
-  const available = (Object.keys(FOIL_WEIGHTS) as Rarity[]).filter(
-    (r) => isFoil(r) && groups[r].length > 0,
+  const available = (Object.keys(weights) as Rarity[]).filter(
+    (r) => weights[r] > 0 && groups[r].length > 0,
   )
   if (available.length === 0) return null
 
-  const total = available.reduce((sum, r) => sum + FOIL_WEIGHTS[r], 0)
+  const total = available.reduce((sum, r) => sum + weights[r], 0)
   let roll = rng() * total
   for (const r of available) {
-    roll -= FOIL_WEIGHTS[r]
+    roll -= weights[r]
     if (roll < 0) return r
   }
   return available[available.length - 1]
+}
+
+/** Options de génération d'un paquet. */
+export interface PackOptions {
+  /**
+   * Garantit une carte de haute rareté (Ultra/Secret) dans le slot foil,
+   * si le set en contient. Utilisé par le pity timer.
+   */
+  guaranteeHighRarity?: boolean
 }
 
 /**
@@ -54,14 +64,20 @@ function pickFoilRarity(
  *
  * - {@link COMMONS_PER_PACK} cartes communes (tirage avec remise).
  * - 1 carte "foil" tirée dans un pool pondéré des raretés supérieures.
+ *   Si `guaranteeHighRarity` est vrai, le slot ne tire que dans Ultra/Secret.
  *
  * Robustesse : si le set n'a pas de commons, on complète avec n'importe
  * quelle carte disponible ; si aucune foil n'existe, le slot devient commun.
  *
- * @param cards toutes les cartes disponibles du set (déjà normalisées).
- * @param rng   source d'aléa (défaut Math.random) pour tests déterministes.
+ * @param cards   toutes les cartes disponibles du set (déjà normalisées).
+ * @param rng     source d'aléa (défaut Math.random) pour tests déterministes.
+ * @param options garanties optionnelles (pity timer).
  */
-export function generatePack(cards: Card[], rng: Rng = Math.random): Card[] {
+export function generatePack(
+  cards: Card[],
+  rng: Rng = Math.random,
+  options: PackOptions = {},
+): Card[] {
   if (cards.length === 0) return []
 
   const groups = groupByRarity(cards)
@@ -72,7 +88,11 @@ export function generatePack(cards: Card[], rng: Rng = Math.random): Card[] {
     pack.push(pick(commonPool, rng))
   }
 
-  const foilRarity = pickFoilRarity(groups, rng)
+  // Slot foil : haute rareté garantie si demandé (et possible), sinon normal.
+  const foilRarity =
+    (options.guaranteeHighRarity &&
+      pickRarityByWeight(groups, rng, HIGH_FOIL_WEIGHTS)) ||
+    pickRarityByWeight(groups, rng, FOIL_WEIGHTS)
   const foilPool = foilRarity ? groups[foilRarity] : commonPool
   pack.push(pick(foilPool.length > 0 ? foilPool : commonPool, rng))
 

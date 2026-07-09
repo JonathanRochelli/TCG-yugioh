@@ -26,3 +26,22 @@ export const CURATED_SETS: SetDef[] = [
 export function findSet(apiName: string): SetDef | undefined {
   return CURATED_SETS.find((s) => s.apiName === apiName)
 }
+
+/**
+ * Renvoie une définition de set : celle curatée si elle existe, sinon une
+ * définition générée (couleurs dérivées du nom) pour un set du catalogue.
+ */
+export function setDefFor(apiName: string): SetDef {
+  const found = findSet(apiName)
+  if (found) return found
+  let h = 0
+  for (let i = 0; i < apiName.length; i++) h = (h * 31 + apiName.charCodeAt(i)) >>> 0
+  const hue = h % 360
+  return {
+    apiName,
+    label: apiName,
+    blurb: '',
+    colors: [`hsl(${hue} 55% 42%)`, `hsl(${(hue + 28) % 360} 55% 16%)`],
+    emblem: '🎴',
+  }
+}

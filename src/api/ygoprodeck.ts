@@ -1,9 +1,11 @@
-import type { ApiCard, Card } from '../types'
+import type { ApiCard, ApiSetSummary, Card } from '../types'
 import { normalizeRarity } from '../game/rarity'
 import { FALLBACK_CARDS } from '../data/fallbackCards'
+import { CURATED_SETS } from '../data/curatedSets'
 
 const API_BASE = 'https://db.ygoprodeck.com/api/v7'
 const CACHE_PREFIX = 'ygo.set.v1:'
+const SETS_CACHE_KEY = 'ygo.allSets.v1'
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7 // 7 jours
 const FETCH_TIMEOUT_MS = 8000 // au-delà : repli hors-ligne
 
@@ -35,6 +37,7 @@ export function normalizeCard(raw: ApiCard, setName: string): Card {
     imageUrlSmall: image?.image_url_small ?? image?.image_url ?? '',
     rarity: normalizeRarity(setInfo?.set_rarity),
     setName,
+    price: setInfo?.set_price,
   }
 }
 
@@ -82,6 +85,68 @@ export function knownSetSize(setName: string): number {
   const cached = readCache(setName)
   if (cached && cached.length > 0) return cached.length
   return fallbackFor(setName).length
+}
+
+/**
+ * Liste connue des cartes d'un set (cache frais, sinon dataset de secours).
+ * Sert à la vue « cartes manquantes ». Vide si le set n'a jamais été chargé.
+ */
+export function getKnownSetCards(setName: string): Card[] {
+  const cached = readCache(setName)
+  if (cached && cached.length > 0) return cached
+  return fallbackFor(setName)
+}
+
+export interface AllSetsResult {
+  sets: ApiSetSummary[]
+  offline: boolean
+}
+
+/**
+ * Liste tous les sets réels via l'API (cardsets.php), triés par date TCG
+ * décroissante. Cache 7 jours ; repli sur les sets curatés si hors-ligne.
+ */
+export async function fetchAllSets(): Promise<AllSetsResult> {
+  try {
+    const raw = localStorage.getItem(SETS_CACHE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw) as { ts: number; sets: ApiSetSummary[] }
+      if (Date.now() - parsed.ts < CACHE_TTL_MS && parsed.sets.length > 0) {
+        return { sets: parsed.sets, offline: false }
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+
+  try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+    let res: Response
+    try {
+      res = await fetch(`${API_BASE}/cardsets.php`, { signal: controller.signal })
+    } finally {
+      clearTimeout(timer)
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const data = (await res.json()) as ApiSetSummary[]
+    const sets = (data ?? [])
+      .filter((s) => s.set_name)
+      .sort((a, b) => (b.tcg_date ?? '').localeCompare(a.tcg_date ?? ''))
+    if (sets.length === 0) throw new Error('liste vide')
+    try {
+      localStorage.setItem(SETS_CACHE_KEY, JSON.stringify({ ts: Date.now(), sets }))
+    } catch {
+      /* quota */
+    }
+    return { sets, offline: false }
+  } catch (err) {
+    console.warn('[ygoprodeck] cardsets.php échoué, repli sur sets curatés.', err)
+    const sets: ApiSetSummary[] = CURATED_SETS.map((s) => ({
+      set_name: s.apiName,
+    }))
+    return { sets, offline: true }
+  }
 }
 
 export interface FetchResult {

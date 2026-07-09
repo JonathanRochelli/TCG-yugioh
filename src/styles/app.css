@@ -801,6 +801,188 @@
   font-size: 0.78rem;
 }
 
+/* ============================ Ajouts fonctionnalités ============================ */
+/* Boutique : actions (Ouvrir + ×5) */
+.pack-card__actions {
+  display: flex;
+  gap: 8px;
+}
+.pack-card__cta {
+  flex: 1;
+}
+.pack-card__bulk {
+  flex: 0 0 auto;
+  padding-left: 0.9em;
+  padding-right: 0.9em;
+}
+
+/* Compteur de paquets à l'ouverture */
+.opening__count {
+  align-self: center;
+  padding: 0.35em 1em;
+  font-size: 0.9rem;
+}
+.recap__stats {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Modale : pied (possédée + prix) */
+.modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+.modal__price {
+  font-weight: 800;
+  color: var(--ok);
+}
+
+/* Collection : carte manquante */
+.coll-card--missing {
+  filter: grayscale(1) brightness(0.55);
+  opacity: 0.75;
+}
+.coll-card--missing:hover {
+  filter: grayscale(0.4) brightness(0.8);
+  opacity: 1;
+}
+
+/* Barre d'outils étendue */
+.toolbar--wrap {
+  flex-wrap: wrap;
+}
+.select {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  color: var(--text);
+  font: inherit;
+}
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.seg {
+  background: var(--bg-elev);
+  color: var(--text-dim);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+.seg--on {
+  background: var(--accent);
+  color: #1a1408;
+}
+
+/* Catalogue */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+.catalog-card {
+  position: relative;
+  min-height: 120px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 14px;
+  text-align: left;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.catalog-card__emblem {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 1.6rem;
+  opacity: 0.9;
+}
+.catalog-card__name {
+  font-weight: 900;
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+.catalog-card__meta {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+/* Squelettes de chargement */
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    var(--bg-elev) 30%,
+    var(--bg-elev-2) 50%,
+    var(--bg-elev) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.3s linear infinite;
+  border: 1px solid var(--border);
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Toasts */
+.toast-host {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+  width: max-content;
+  max-width: 92vw;
+  pointer-events: none;
+}
+.toast {
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  animation: toast-in 0.25s ease;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.toast--reward {
+  background: linear-gradient(180deg, #ffd766, var(--accent));
+  color: #1a1408;
+  border-color: transparent;
+}
+.toast--success {
+  border-color: var(--ok);
+}
+.toast--error {
+  border-color: var(--danger);
+}
+
 /* ============================ Responsive / mobile ============================ */
 html,
 body {

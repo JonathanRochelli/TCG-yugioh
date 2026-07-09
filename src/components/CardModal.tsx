@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { Card } from '../types'
 import { RARITY_COLOR, isFoil } from '../game/rarity'
 import { CardArt } from './CardArt'
@@ -9,6 +10,14 @@ interface Props {
 }
 
 export function CardModal({ card, ownedCount, onClose }: Props) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   const rarityClass = `r-${card.rarity.replace(/\s+/g, '-')}`
   const stats: Array<[string, string | number | undefined]> = [
     ['Type', card.type],
@@ -51,8 +60,13 @@ export function CardModal({ card, ownedCount, onClose }: Props) {
                 ))}
             </dl>
             {card.desc && <p className="modal__desc muted">{card.desc}</p>}
-            <div className="modal__owned">
-              Possédée ×{ownedCount}
+            <div className="modal__footer">
+              <span className="modal__owned">Possédée ×{ownedCount}</span>
+              {card.price && Number(card.price) > 0 && (
+                <span className="modal__price" title="Prix indicatif (marché)">
+                  ~${card.price}
+                </span>
+              )}
             </div>
           </div>
         </div>

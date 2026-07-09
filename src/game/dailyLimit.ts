@@ -1,5 +1,5 @@
 /** Nombre maximum de paquets ouvrables par jour. */
-export const MAX_PACKS_PER_DAY = 500
+export const MAX_PACKS_PER_DAY = 20
 
 const STORAGE_KEY = 'ygo.dailyLimit.v1'
 
@@ -80,10 +80,18 @@ export function canOpenToday(): boolean {
  * Ne fait rien (renvoie 0) si la limite est déjà atteinte.
  */
 export function recordPackOpen(): number {
+  return recordPacks(1)
+}
+
+/**
+ * Enregistre l'ouverture de `n` paquets (borné par la limite) et renvoie le
+ * nombre restant après.
+ */
+export function recordPacks(n: number): number {
   const today = dayKey()
   const state = normalizeDaily(read(), today)
-  if (state.opened >= MAX_PACKS_PER_DAY) return 0
-  const updated: DailyState = { date: today, opened: state.opened + 1 }
+  const opened = Math.min(MAX_PACKS_PER_DAY, state.opened + Math.max(0, n))
+  const updated: DailyState = { date: today, opened }
   write(updated)
   return remainingFrom(updated, today)
 }

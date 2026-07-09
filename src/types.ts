@@ -60,6 +60,16 @@ export interface Card {
   rarity: Rarity
   /** Nom du set dont provient cette version de la carte. */
   setName: string
+  /** Prix indicatif (USD) fourni par l'API pour ce set, si disponible. */
+  price?: string
+}
+
+/** Set listé par l'API (cardsets.php) pour le catalogue. */
+export interface ApiSetSummary {
+  set_name: string
+  set_code?: string
+  num_of_cards?: number
+  tcg_date?: string
 }
 
 /** Définition d'un booster curaté. */

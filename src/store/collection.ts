@@ -54,6 +54,8 @@ export interface CollectionStore {
   ownedKeys: Set<string>
   /** Ajoute plusieurs cartes (un paquet) et applique un delta de pièces. */
   addCards: (cards: Card[], coinDelta: number) => void
+  /** Ajoute (ou retire) des pièces. */
+  addCoins: (delta: number) => void
   ownedCount: (card: Card) => number
 }
 
@@ -89,11 +91,15 @@ export function useCollection(): CollectionStore {
     if (coinDelta !== 0) setCoins((c) => c + coinDelta)
   }, [])
 
+  const addCoins = useCallback((delta: number) => {
+    if (delta !== 0) setCoins((c) => c + delta)
+  }, [])
+
   const ownedKeys = new Set(Object.keys(collection))
   const ownedCount = useCallback(
     (card: Card) => collection[cardKey(card)]?.count ?? 0,
     [collection],
   )
 
-  return { collection, coins, ownedKeys, addCards, ownedCount }
+  return { collection, coins, ownedKeys, addCards, addCoins, ownedCount }
 }

@@ -1,9 +1,11 @@
 import type { Card, Rarity } from '../types'
 
 /** Pièces de départ à la première ouverture de l'app. */
-export const STARTING_COINS = 90000
+export const STARTING_COINS = 500
 /** Coût d'un paquet en pièces. */
 export const PACK_COST = 100
+/** Bonus de pièces offert une fois par jour (anti-impasse économique). */
+export const DAILY_BONUS_COINS = 200
 
 /**
  * Valeur en « poussière » (pièces) obtenue quand on reçoit un DOUBLON.

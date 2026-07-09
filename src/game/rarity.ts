@@ -24,6 +24,18 @@ export const FOIL_WEIGHTS: Record<Rarity, number> = {
   'Secret Rare': 3,
 }
 
+/**
+ * Poids du slot rare quand le pity timer garantit une carte de haute rareté.
+ * On ne tire alors que dans Ultra Rare / Secret Rare.
+ */
+export const HIGH_FOIL_WEIGHTS: Record<Rarity, number> = {
+  Common: 0,
+  Rare: 0,
+  'Super Rare': 0,
+  'Ultra Rare': 80,
+  'Secret Rare': 20,
+}
+
 /** Couleur CSS associée à une rareté (pour bordures/halos). */
 export const RARITY_COLOR: Record<Rarity, string> = {
   Common: 'var(--r-common)',

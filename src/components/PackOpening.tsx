@@ -11,6 +11,8 @@ interface Props {
   newFlags: boolean[]
   dustEarned: number
   offline: boolean
+  /** Nombre de paquets ouverts (ouverture multiple). */
+  packCount: number
   canOpenAnother: boolean
   onOpenAnother: () => void
   onGoCollection: () => void
@@ -25,6 +27,7 @@ export function PackOpening({
   newFlags,
   dustEarned,
   offline,
+  packCount,
   canOpenAnother,
   onOpenAnother,
   onGoCollection,
@@ -35,8 +38,9 @@ export function PackOpening({
   const [revealed, setRevealed] = useState<Set<number>>(new Set())
 
   const allRevealed = revealed.size === pack.length
+  const newCount = useMemo(() => newFlags.filter(Boolean).length, [newFlags])
 
-  /** Meilleure carte du paquet (pour la mettre en avant dans le récap). */
+  /** Meilleure carte du lot (pour la mettre en avant dans le récap). */
   const best = useMemo(() => {
     let idx = 0
     for (let i = 1; i < pack.length; i++) {
@@ -61,6 +65,9 @@ export function PackOpening({
   if (phase === 'pack') {
     return (
       <section className="opening">
+        {packCount > 1 && (
+          <div className="opening__count pill">{packCount} paquets</div>
+        )}
         <BoosterPack
           set={set}
           interactive
@@ -79,13 +86,16 @@ export function PackOpening({
   return (
     <section className="opening">
       <div className="opening__head">
-        <h2>{set.label}</h2>
+        <h2>
+          {set.label}
+          {packCount > 1 && <span className="muted"> · ×{packCount}</span>}
+        </h2>
         {!allRevealed ? (
           <button className="secondary" onClick={revealAll}>
             Tout révéler
           </button>
         ) : (
-          <span className="pill pill--ok">Paquet ouvert !</span>
+          <span className="pill pill--ok">Ouvert !</span>
         )}
       </div>
 
@@ -119,14 +129,13 @@ export function PackOpening({
               {pack[best].rarity}
             </span>
           </div>
-          {dustEarned > 0 && (
-            <div className="recap__dust">
-              +{dustEarned} 🪙 de poussière (doublons recyclés)
-            </div>
-          )}
+          <div className="recap__stats muted">
+            {pack.length} cartes · {newCount} nouvelle{newCount > 1 ? 's' : ''}
+            {dustEarned > 0 && <> · +{dustEarned} 🪙 de poussière</>}
+          </div>
           <div className="recap__actions">
             <button onClick={onOpenAnother} disabled={!canOpenAnother}>
-              {canOpenAnother ? 'Ouvrir un autre' : 'Limite atteinte'}
+              {canOpenAnother ? 'Ouvrir encore' : 'Indisponible'}
             </button>
             <button className="secondary" onClick={onGoCollection}>
               Voir la collection

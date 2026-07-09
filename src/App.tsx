@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Card, SetDef } from './types'
 import { Header } from './components/Header'
 import { SetSelect } from './components/SetSelect'
 import { PackOpening } from './components/PackOpening'
 import { Collection } from './components/Collection'
+import { Catalog } from './components/Catalog'
 import { CardModal } from './components/CardModal'
+import { useToast } from './components/Toast'
 import { fetchSetCards } from './api/ygoprodeck'
 import { generatePack } from './game/packOpening'
 import { PACK_COST, dustFromPack } from './game/economy'
@@ -12,12 +14,14 @@ import {
   MAX_PACKS_PER_DAY,
   canOpenToday,
   packsRemainingToday,
-  recordPackOpen,
+  recordPacks,
 } from './game/dailyLimit'
+import { claimDailyBonus } from './game/dailyBonus'
+import { isPityDue, registerPack } from './game/pity'
 import { cardKey, useCollection } from './store/collection'
 import './styles/app.css'
 
-export type View = 'sets' | 'opening' | 'collection'
+export type View = 'sets' | 'opening' | 'collection' | 'catalog'
 
 interface OpenedPack {
   set: SetDef
@@ -25,10 +29,12 @@ interface OpenedPack {
   newFlags: boolean[]
   dust: number
   offline: boolean
+  packCount: number
 }
 
 export default function App() {
   const store = useCollection()
+  const { notify } = useToast()
   const [view, setView] = useState<View>('sets')
   const [loadingSet, setLoadingSet] = useState<string | null>(null)
   const [opened, setOpened] = useState<OpenedPack | null>(null)
@@ -40,44 +46,74 @@ export default function App() {
     [store.collection],
   )
 
-  async function openPack(set: SetDef) {
+  // Bonus quotidien : crédité une fois par jour au lancement.
+  useEffect(() => {
+    const bonus = claimDailyBonus()
+    if (bonus > 0) {
+      store.addCoins(bonus)
+      notify(`Bonus quotidien : +${bonus} 🪙`, 'reward')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function openPacks(set: SetDef, count: number) {
     if (loadingSet) return
     if (!canOpenToday()) {
       setRemaining(0)
+      notify('Limite de paquets atteinte pour aujourd’hui.', 'error')
       return
     }
-    if (store.coins < PACK_COST) return
+    // On borne par les pièces ET les paquets restants.
+    const n = Math.min(
+      count,
+      remaining,
+      Math.floor(store.coins / PACK_COST),
+    )
+    if (n <= 0) {
+      notify('Pas assez de pièces ou de paquets restants.', 'error')
+      return
+    }
 
     setLoadingSet(set.apiName)
     try {
       const { cards, offline } = await fetchSetCards(set.apiName)
       if (cards.length === 0) {
-        setLoadingSet(null)
+        notify('Ce set est indisponible.', 'error')
         return
       }
 
-      // Décompte quotidien au moment de l'ouverture effective.
-      const left = recordPackOpen()
-      setRemaining(left)
-
-      const pack = generatePack(cards)
-
-      // Doublons calculés AVANT ajout à la collection.
       const ownedBefore = store.ownedKeys
-      const newFlags: boolean[] = []
       const seen = new Set(ownedBefore)
-      for (const c of pack) {
-        const key = cardKey(c)
-        newFlags.push(!seen.has(key))
-        seen.add(key)
+      const all: Card[] = []
+      const newFlags: boolean[] = []
+      let guaranteed = 0
+
+      for (let p = 0; p < n; p++) {
+        const due = isPityDue()
+        const pack = generatePack(cards, Math.random, {
+          guaranteeHighRarity: due,
+        })
+        registerPack(pack)
+        if (due) guaranteed++
+        for (const c of pack) {
+          const key = cardKey(c)
+          newFlags.push(!seen.has(key))
+          seen.add(key)
+          all.push(c)
+        }
       }
-      const dust = dustFromPack(pack, ownedBefore, cardKey)
 
-      // Ajout à la collection + solde net (poussière gagnée - coût du paquet).
-      store.addCards(pack, dust - PACK_COST)
+      const dust = dustFromPack(all, ownedBefore, cardKey)
+      store.addCards(all, dust - n * PACK_COST)
+      setRemaining(recordPacks(n))
 
-      setOpened({ set, cards: pack, newFlags, dust, offline })
+      setOpened({ set, cards: all, newFlags, dust, offline, packCount: n })
       setView('opening')
+
+      if (offline) notify('Mode hors-ligne : cartes de démonstration.', 'info')
+      if (guaranteed > 0) {
+        notify(`Pity timer : carte rare garantie ✨`, 'reward')
+      }
     } finally {
       setLoadingSet(null)
     }
@@ -99,8 +135,12 @@ export default function App() {
           coins={store.coins}
           packsRemaining={remaining}
           loadingSet={loadingSet}
-          onOpen={openPack}
+          onOpen={openPacks}
         />
+      )}
+
+      {view === 'catalog' && (
+        <Catalog onOpen={openPacks} loadingSet={loadingSet} />
       )}
 
       {view === 'opening' && opened && (
@@ -110,8 +150,9 @@ export default function App() {
           newFlags={opened.newFlags}
           dustEarned={opened.dust}
           offline={opened.offline}
+          packCount={opened.packCount}
           canOpenAnother={remaining > 0 && store.coins >= PACK_COST}
-          onOpenAnother={() => openPack(opened.set)}
+          onOpenAnother={() => openPacks(opened.set, 1)}
           onGoCollection={() => setView('collection')}
           onInspect={setInspecting}
         />
