@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Card, CollectionState } from '../types'
 import { CURATED_SETS } from '../data/curatedSets'
-import { getKnownSetCards } from '../api/ygoprodeck'
+import { fetchSetCards, getKnownSetCards } from '../api/ygoprodeck'
 import { RARITY_ORDER, rarityRank } from '../game/rarity'
 import { rarityLabel, translateAttribute } from '../game/i18n'
 import { cardKey, setProgress } from '../store/collection'
@@ -15,7 +15,7 @@ interface Props {
   onGoShop: () => void
 }
 
-type Ownership = 'owned' | 'missing'
+type Ownership = 'all' | 'owned' | 'missing'
 type SortKey = 'rarity' | 'atk' | 'name'
 type TypeFilter = 'all' | 'Monster' | 'Spell' | 'Trap'
 
@@ -42,28 +42,76 @@ export function Collection({
   const entries = useMemo(() => Object.values(collection), [collection])
   const [setFilter, setSetFilter] = useState<string>('all')
   const [query, setQuery] = useState('')
-  const [ownership, setOwnership] = useState<Ownership>('owned')
+  const [ownership, setOwnership] = useState<Ownership>('all')
   const [sort, setSort] = useState<SortKey>('rarity')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [attrFilter, setAttrFilter] = useState<string>('all')
   const [levelFilter, setLevelFilter] = useState<string>('all')
+  // Incrémenté au fur et à mesure que les sets se chargent (remplit le cache
+  // des cartes connues → la liste des manquantes devient complète).
+  const [dataVersion, setDataVersion] = useState(0)
+
+  // Précharge la liste complète des cartes de chaque booster curaté, pour que
+  // la vue « manquantes / groupée » soit complète même sans avoir ouvert le set.
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      for (const s of CURATED_SETS) {
+        await fetchSetCards(s.apiName)
+        if (!alive) return
+        setDataVersion((v) => v + 1)
+      }
+    })()
+    return () => {
+      alive = false
+    }
+  }, [])
 
   const totalUnique = entries.length
   const totalCopies = entries.reduce((s, e) => s + e.count, 0)
   const duplicateCount = entries.filter((e) => e.count > 1).length
 
+  // Cartes connues pour le filtre courant (un set, ou l'union des curatés).
+  const knownForFilter = useMemo<Card[]>(() => {
+    if (setFilter !== 'all') return getKnownSetCards(setFilter)
+    const seen = new Set<string>()
+    const all: Card[] = []
+    for (const s of CURATED_SETS) {
+      for (const c of getKnownSetCards(s.apiName)) {
+        const k = cardKey(c)
+        if (!seen.has(k)) {
+          seen.add(k)
+          all.push(c)
+        }
+      }
+    }
+    return all
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setFilter, dataVersion])
+
   const items = useMemo<Item[]>(() => {
     let base: Item[]
-    if (ownership === 'missing') {
-      if (setFilter === 'all') return []
-      const owned = new Set(Object.keys(collection))
-      base = getKnownSetCards(setFilter)
-        .filter((c) => !owned.has(cardKey(c)))
-        .map((c) => ({ card: c, count: 0 }))
-    } else {
+    if (ownership === 'owned') {
       base = entries.filter(
         (e) => setFilter === 'all' || e.card.setName === setFilter,
       )
+    } else {
+      // « Toutes » (groupé) ou « Manquantes » : on part des cartes connues et
+      // on y superpose ce qu'on possède (count 0 = manquante, grisée).
+      const map = new Map<string, Item>()
+      for (const c of knownForFilter) {
+        const k = cardKey(c)
+        const owned = collection[k]
+        map.set(k, { card: owned?.card ?? c, count: owned?.count ?? 0 })
+      }
+      // Ajoute les cartes possédées absentes de la liste connue (sécurité).
+      for (const e of entries) {
+        if (setFilter !== 'all' && e.card.setName !== setFilter) continue
+        const k = cardKey(e.card)
+        if (!map.has(k)) map.set(k, { card: e.card, count: e.count })
+      }
+      base = [...map.values()]
+      if (ownership === 'missing') base = base.filter((it) => it.count === 0)
     }
 
     const q = query.trim().toLowerCase()
@@ -80,9 +128,10 @@ export function Collection({
           a.card.name.localeCompare(b.card.name)
         )
       })
-  }, [entries, collection, setFilter, query, ownership, sort, typeFilter, attrFilter, levelFilter])
+  }, [entries, collection, knownForFilter, setFilter, query, ownership, sort, typeFilter, attrFilter, levelFilter])
 
   const cardList = useMemo(() => items.map((it) => it.card), [items])
+  const ownedInView = useMemo(() => items.filter((it) => it.count > 0).length, [items])
 
   if (totalUnique === 0) {
     return (
@@ -139,6 +188,12 @@ export function Collection({
         />
         <div className="segmented">
           <button
+            className={ownership === 'all' ? 'seg seg--on' : 'seg'}
+            onClick={() => setOwnership('all')}
+          >
+            Toutes
+          </button>
+          <button
             className={ownership === 'owned' ? 'seg seg--on' : 'seg'}
             onClick={() => setOwnership('owned')}
           >
@@ -185,36 +240,38 @@ export function Collection({
         )}
       </div>
 
-      {ownership === 'missing' && setFilter === 'all' ? (
-        <p className="muted" style={{ textAlign: 'center', marginTop: 24 }}>
-          Choisis un set ci-dessus pour voir les cartes qu'il te reste à
-          obtenir (fabricables avec de la poussière ✨).
+      {ownership !== 'owned' && items.length > 0 && (
+        <p className="muted" style={{ marginBottom: 12 }}>
+          {ownedInView}/{items.length} obtenues
+          {ownership === 'all' && ' · les grisées sont fabricables avec de la poussière ✨'}
         </p>
-      ) : (
-        <div className="collection-grid">
-          {items.map((it, idx) => {
-            const rarityClass = `r-${it.card.rarity.replace(/\s+/g, '-')}`
-            const missing = it.count === 0
-            return (
-              <div
-                key={`${it.card.setName}-${it.card.id}`}
-                className={`coll-card ${missing ? 'coll-card--missing' : ''}`}
-                onClick={() => onInspect(cardList, idx)}
-              >
-                <CardArt card={it.card} small />
-                {it.count > 1 && <span className="coll-card__count">×{it.count}</span>}
-                <span className={`rarity-chip coll-card__rarity ${rarityClass}`}>
-                  {rarityLabel(it.card.rarity)}
-                </span>
-              </div>
-            )
-          })}
-        </div>
       )}
 
-      {ownership !== 'missing' && items.length === 0 && (
+      <div className="collection-grid">
+        {items.map((it, idx) => {
+          const rarityClass = `r-${it.card.rarity.replace(/\s+/g, '-')}`
+          const missing = it.count === 0
+          return (
+            <div
+              key={`${it.card.setName}-${it.card.id}`}
+              className={`coll-card ${missing ? 'coll-card--missing' : ''}`}
+              onClick={() => onInspect(cardList, idx)}
+            >
+              <CardArt card={it.card} small />
+              {it.count > 1 && <span className="coll-card__count">×{it.count}</span>}
+              <span className={`rarity-chip coll-card__rarity ${rarityClass}`}>
+                {rarityLabel(it.card.rarity)}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+
+      {items.length === 0 && (
         <p className="muted" style={{ textAlign: 'center', marginTop: 24 }}>
-          Aucune carte ne correspond.
+          {ownership === 'missing'
+            ? 'Aucune carte manquante ici — bravo !'
+            : 'Aucune carte ne correspond.'}
         </p>
       )}
 

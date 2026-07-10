@@ -6,7 +6,7 @@ import { CURATED_SETS } from '../data/curatedSets'
 const API_BASE = 'https://db.ygoprodeck.com/api/v7'
 /** Langue des données de cartes (noms, descriptions, attributs). */
 const API_LANG = 'fr'
-const CACHE_PREFIX = 'ygo.set.v2.fr:'
+const CACHE_PREFIX = 'ygo.set.v3.fr:'
 const SETS_CACHE_KEY = 'ygo.allSets.v1'
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7 // 7 jours
 const FETCH_TIMEOUT_MS = 8000 // au-delà : repli hors-ligne
