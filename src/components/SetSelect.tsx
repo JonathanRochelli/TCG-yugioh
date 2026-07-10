@@ -63,7 +63,7 @@ export function SetSelect({ coins, packsRemaining, loadingSet, onOpen }: Props) 
                     onClick={() => onOpen(set, BULK)}
                     title={`Ouvrir ${BULK} paquets · ${PACK_COST * BULK} 🪙`}
                   >
-                    ×{BULK}
+                    Ouvrir ×{BULK} · {PACK_COST * BULK} 🪙
                   </button>
                 </div>
               </div>
