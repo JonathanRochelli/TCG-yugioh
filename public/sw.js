@@ -1,5 +1,5 @@
 // Service worker : cache d'exécution pour un fonctionnement hors-ligne.
-const CACHE = 'ygo-cache-v1'
+const CACHE = 'ygo-cache-v3'
 
 self.addEventListener('install', () => {
   self.skipWaiting()
@@ -41,23 +41,22 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Autres GET : cache d'abord, sinon réseau (et on met en cache).
+  // Autres GET : stale-while-revalidate — on sert le cache tout de suite mais
+  // on rafraîchit en arrière-plan, pour que les mises à jour (images de
+  // boosters, etc.) se propagent sans rester bloquées sur une version périmée.
   event.respondWith(
     (async () => {
-      const cached = await caches.match(req)
-      if (cached) return cached
-      try {
-        const fresh = await fetch(req)
-        const cacheable =
-          url.origin === self.location.origin || req.destination === 'image'
-        if (fresh && cacheable) {
-          const cache = await caches.open(CACHE)
-          cache.put(req, fresh.clone())
-        }
-        return fresh
-      } catch {
-        return cached || Response.error()
-      }
+      const cache = await caches.open(CACHE)
+      const cached = await cache.match(req)
+      const network = fetch(req)
+        .then((fresh) => {
+          const cacheable =
+            url.origin === self.location.origin || req.destination === 'image'
+          if (fresh && fresh.ok && cacheable) cache.put(req, fresh.clone())
+          return fresh
+        })
+        .catch(() => null)
+      return cached || (await network) || Response.error()
     })(),
   )
 })

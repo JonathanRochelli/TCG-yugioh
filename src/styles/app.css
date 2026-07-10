@@ -33,6 +33,17 @@
   justify-content: center;
   flex-wrap: wrap;
 }
+/* Page sélectionnée : mise en avant discrète, sans effet de bouton doré relevé. */
+.header__nav button:not(.secondary),
+.header__nav button:not(.secondary):hover:not(:disabled) {
+  background: rgba(214, 178, 92, 0.12);
+  border-color: var(--gold-deep);
+  color: var(--gold-bright);
+  box-shadow: none;
+  transform: none;
+  filter: none;
+  cursor: default;
+}
 .header__stats {
   display: flex;
   gap: 10px;
