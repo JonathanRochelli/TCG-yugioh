@@ -108,12 +108,10 @@ export function PackOpening({
           {set.label}
           {packCount > 1 && <span className="muted"> · ×{packCount}</span>}
         </h2>
-        {!allRevealed ? (
+        {!allRevealed && (
           <button className="secondary" onClick={revealAll}>
             Tout révéler
           </button>
-        ) : (
-          <span className="pill pill--ok">Ouvert !</span>
         )}
       </div>
 
