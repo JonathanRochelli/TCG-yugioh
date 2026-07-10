@@ -25,12 +25,20 @@ export const USE_CUSTOM_PACK_IMAGES = true
 
 const BASE = import.meta.env.BASE_URL
 
+/**
+ * Version des assets (images perso). À incrémenter dès qu'on remplace une
+ * image en gardant le même nom de fichier : l'URL change (`?v=…`), ce qui
+ * force le navigateur ET le service worker à retélécharger la nouvelle image
+ * au lieu de servir l'ancienne version en cache.
+ */
+const ASSET_VERSION = '3'
+
 /** Dos de carte « maison » (repli, toujours disponible). */
 export const CARD_BACK_FALLBACK: string = cardBackSvg
 
 /** Dos de carte affiché (image perso si activée, sinon repli). */
 export const CARD_BACK: string = USE_CUSTOM_CARD_BACK
-  ? `${BASE}card-back.png`
+  ? `${BASE}card-back.png?v=${ASSET_VERSION}`
   : cardBackSvg
 
 /** Transforme un nom de set en nom de fichier (slug). */
@@ -45,5 +53,5 @@ export function slugifySet(apiName: string): string {
 /** URL de l'image de booster perso pour un set, si le mode est activé. */
 export function packImageFor(apiName: string): string | undefined {
   if (!USE_CUSTOM_PACK_IMAGES) return undefined
-  return `${BASE}packs/${slugifySet(apiName)}.png`
+  return `${BASE}packs/${slugifySet(apiName)}.png?v=${ASSET_VERSION}`
 }
