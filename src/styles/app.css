@@ -33,13 +33,16 @@
   justify-content: center;
   flex-wrap: wrap;
 }
-/* Page sélectionnée : mise en avant discrète, sans effet de bouton doré relevé. */
+/* Page sélectionnée : pas d'aspect « bouton » (ni cadre, ni fond, ni relief) —
+   juste le libellé doré souligné. */
 .header__nav button:not(.secondary),
-.header__nav button:not(.secondary):hover:not(:disabled) {
-  background: rgba(214, 178, 92, 0.12);
-  border-color: var(--gold-deep);
+.header__nav button:not(.secondary):hover:not(:disabled),
+.header__nav button:not(.secondary):active:not(:disabled) {
+  background: none;
+  border-color: transparent;
   color: var(--gold-bright);
-  box-shadow: none;
+  box-shadow: inset 0 -2px 0 var(--gold);
+  border-radius: 4px;
   transform: none;
   filter: none;
   cursor: default;
@@ -1614,6 +1617,14 @@ button:focus-visible,
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+  }
+  /* Aucun effet « bouton » (relief/ombre) au survol ou à l'appui. */
+  .mobile-tabs button:hover:not(:disabled),
+  .mobile-tabs button:active:not(:disabled) {
+    background: none;
+    box-shadow: none;
+    transform: none;
+    filter: none;
   }
   .mobile-tabs button.active {
     color: var(--gold-bright);
