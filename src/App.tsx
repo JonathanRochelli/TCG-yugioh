@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Card, SetDef } from './types'
 import { Home } from './components/Home'
+import { InstallPrompt } from './components/InstallPrompt'
 import { Header } from './components/Header'
 import { SetSelect } from './components/SetSelect'
 import { PackOpening } from './components/PackOpening'
@@ -181,6 +182,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <InstallPrompt />
       <Header
         coins={store.coins}
         dust={store.dust}
