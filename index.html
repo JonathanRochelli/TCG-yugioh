@@ -9,7 +9,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="./icon.svg" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <script>
+      // Capture l'événement d'installation au plus tôt (avant le montage React).
+      window.__bipEvent = null
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault()
+        window.__bipEvent = e
+        window.dispatchEvent(new Event('bip-ready'))
+      })
+    </script>
     <meta name="description" content="Ouvre des boosters et collectionne de vraies cartes Yu-Gi-Oh — thème Égypte antique." />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Yu-Gi-Oh Boosters — Ouvre. Collectionne. Brille." />

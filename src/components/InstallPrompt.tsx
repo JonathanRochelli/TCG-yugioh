@@ -33,12 +33,25 @@ export function InstallPrompt() {
       /* ignore */
     }
 
-    const onBIP = (e: Event) => {
-      e.preventDefault()
-      setDeferred(e as BeforeInstallPromptEvent)
+    const win = window as unknown as { __bipEvent?: BeforeInstallPromptEvent }
+
+    const show = (e: BeforeInstallPromptEvent) => {
+      setDeferred(e)
       setVisible(true)
     }
+
+    // Événement déjà capté par le script inline (index.html) ?
+    if (win.__bipEvent) show(win.__bipEvent)
+
+    const onBIP = (e: Event) => {
+      e.preventDefault()
+      show(e as BeforeInstallPromptEvent)
+    }
+    const onReady = () => {
+      if (win.__bipEvent) show(win.__bipEvent)
+    }
     window.addEventListener('beforeinstallprompt', onBIP)
+    window.addEventListener('bip-ready', onReady)
 
     // iOS/Safari ne déclenche pas l'événement : on montre des instructions.
     if (isIOS()) {
@@ -51,6 +64,7 @@ export function InstallPrompt() {
 
     return () => {
       window.removeEventListener('beforeinstallprompt', onBIP)
+      window.removeEventListener('bip-ready', onReady)
       window.removeEventListener('appinstalled', onInstalled)
     }
   }, [])
