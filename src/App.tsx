@@ -34,6 +34,9 @@ import './styles/app.css'
 
 export type View = 'home' | 'sets' | 'opening' | 'collection' | 'profile'
 
+/** Marque que l'accueil « temple » a déjà été vu (affiché une seule fois). */
+const SEEN_HOME_KEY = 'ygo.seenHome.v1'
+
 interface OpenedPack {
   set: SetDef
   cards: Card[]
@@ -51,7 +54,13 @@ interface Inspecting {
 export default function App() {
   const store = useCollection()
   const { notify } = useToast()
-  const [view, setView] = useState<View>('home')
+  const [view, setView] = useState<View>(() => {
+    try {
+      return localStorage.getItem(SEEN_HOME_KEY) === '1' ? 'sets' : 'home'
+    } catch {
+      return 'home'
+    }
+  })
   const [loadingSet, setLoadingSet] = useState<string | null>(null)
   const [opened, setOpened] = useState<OpenedPack | null>(null)
   const [inspecting, setInspecting] = useState<Inspecting | null>(null)
@@ -177,7 +186,18 @@ export default function App() {
   }
 
   if (view === 'home') {
-    return <Home onEnter={() => setView('sets')} />
+    return (
+      <Home
+        onEnter={() => {
+          try {
+            localStorage.setItem(SEEN_HOME_KEY, '1')
+          } catch {
+            /* ignore */
+          }
+          setView('sets')
+        }}
+      />
+    )
   }
 
   return (

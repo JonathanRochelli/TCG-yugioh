@@ -42,6 +42,7 @@ export function Header({
           <div className="header__title">Yu-Gi-Oh Boosters</div>
           <div className="header__subtitle muted">Ouvre. Collectionne. Brille.</div>
         </div>
+        <span className="header__emblem">𓂀</span>
       </div>
 
       <nav className="header__nav">
