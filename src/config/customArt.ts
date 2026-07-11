@@ -31,7 +31,7 @@ const BASE = import.meta.env.BASE_URL
  * force le navigateur ET le service worker à retélécharger la nouvelle image
  * au lieu de servir l'ancienne version en cache.
  */
-const ASSET_VERSION = '4'
+const ASSET_VERSION = '5'
 
 /** Dos de carte « maison » (repli, toujours disponible). */
 export const CARD_BACK_FALLBACK: string = cardBackSvg
